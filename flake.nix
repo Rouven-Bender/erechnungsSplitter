@@ -1,5 +1,5 @@
 {
-  description = "Sample Nix Flake";
+  description = "dev flake";
 
   inputs = {
       nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -17,6 +17,7 @@
           buildInputs = [
             pkgs.poppler_utils
             pkgs.go
+			pkgs.zulu23
           ];
 
           shellHook = ''
