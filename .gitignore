@@ -1,3 +1,5 @@
 leftof
 testdata/*
 notes
+.vscode/*
+target/*
