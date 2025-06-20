@@ -16,15 +16,15 @@
         {
           buildInputs = [
             pkgs.poppler_utils
-			pkgs.zulu23
-			pkgs.maven
-			pkgs.vscodium-fhs
+			      pkgs.zulu23
+			      pkgs.maven
+			      pkgs.vscodium-fhs
           ];
 
           shellHook = ''
-            alias build="mvn package"
+            alias build="mvn compile assembly:single"
             alias b="build"
-            alias e="java -cp target/erechnungssplitter-1.0-SNAPSHOT.jar bender.rouven.App"
+            alias e="java -cp target/erechnungssplitter-1.0-SNAPSHOT-jar-with-dependencies.jar bender.rouven.App"
             alias r="build && e"
             echo "Hello World"
           '';

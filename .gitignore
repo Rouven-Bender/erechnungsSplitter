@@ -1,5 +1,5 @@
 leftof
-testdata/*
+*.pdf
 notes
 .vscode/*
 target/*
