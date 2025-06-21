@@ -17,6 +17,10 @@ public class App
                 Invoice iv = zu.extractInvoice();
                 System.out.println(iv.getNumber()); // Rechnungsnummer
                 System.out.println(iv.getOwnVATID()); // VAT ID of seller
+                System.out.println(iv.getSender().getTaxID());
+                System.out.println(iv.getSender().getVATID());
+                System.out.println(zu.getAmount()); // Rechnungstotal
+                System.out.println(zu.getTaxBasisTotalAmount()); // Rechnungsnetto
                 IZUGFeRDExportableItem[] items = iv.getZFItems();
                 DecimalFormat df = new DecimalFormat("#,##0.000");
                 for (int i=0; i< items.length; i++) {
