@@ -22,11 +22,9 @@
           ];
 
           shellHook = ''
-            alias build="mvn compile assembly:single"
-            alias b="build"
-            alias e="java -cp target/erechnungssplitter-1.0-SNAPSHOT-jar-with-dependencies.jar bender.rouven.App"
-            alias r="build && e"
-            echo "Hello World"
+			alias code="codium"
+            alias r="mvn spring-boot:run"
+            echo "use 'r' to run project"
           '';
         };
   };
