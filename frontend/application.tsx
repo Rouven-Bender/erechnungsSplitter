@@ -8,6 +8,7 @@ import { pdfjs } from 'react-pdf';
 
 
 function Application(){
+    // Move to /static folder so it doesn't need internet
     pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 	return (
 		<div className="grid grid-cols-2 min-h-screen">
