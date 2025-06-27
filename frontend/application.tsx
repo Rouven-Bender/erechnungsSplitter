@@ -1,9 +1,13 @@
 import React from "react";
 import {createRoot} from 'react-dom/client';
 
+import FileTree from "./components/filetree";
+
 function Application(){
 	return (
-		<p>React loaded</p>
+		<div>
+		<FileTree />
+		</div>
 	)
 }
 
