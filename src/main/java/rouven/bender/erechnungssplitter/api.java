@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
@@ -12,14 +13,28 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import rouven.bender.erechnungssplitter.models.Display;
+
 @RestController
 class RestAPI {
     private File path;
     private String basepath;
+    private ArrayList<File> pdfs;
+    private int selected = 0;
+
     RestAPI() {
         //TODO: Make this configurable
         basepath = Paths.get(System.getProperty("user.home"), "src", "erechnungsSplitter").toString();
         path = new File(basepath);
+        refreshPDFSGlobal();
+    }
+
+    @GetMapping("/ui")
+    Display getUIState(){
+        Display out = new Display();
+        out.currentOfPDFS = selected + 1;
+        out.numberOfPDFS = pdfs.size();
+        return out;
     }
 
     @GetMapping("/reset")
@@ -45,15 +60,28 @@ class RestAPI {
         }
         return p;
     }
-    @PostMapping("/open")
+
+    @PostMapping("/open") //Opening a folder
     void open(@RequestBody String directoryname){
         Path p = Paths.get(path.toString(), directoryname).normalize();
         path = new File(p.toUri());
+
+        refreshPDFSGlobal();
+    }
+
+    private void refreshPDFSGlobal(){
+        pdfs = new ArrayList<File>();
+        File[] fs = path.listFiles(File::isFile);
+        for (int i=0; i<fs.length; i++) {
+            if (fs[i].getName().endsWith(".pdf")){
+                pdfs.add(fs[i]);
+            }
+        }
     }
 
     @GetMapping(path = "/pdf", produces = "application/pdf")
     ResponseEntity<byte[]> pdf() {
-        File filename = new File(Paths.get(path.toString(), "mustang.pdf").toString());
+        File filename = pdfs.get(0);
         try (FileInputStream fis = new FileInputStream(filename)){ 
             byte[] out = fis.readAllBytes();
             return ResponseEntity.ok().cacheControl(CacheControl.noCache()).body(out);

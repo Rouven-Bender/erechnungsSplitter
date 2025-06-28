@@ -10,7 +10,6 @@ import org.springframework.security.web.access.expression.WebExpressionAuthoriza
 
 @Configuration
 public class SecurityConfiguration {
-         
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
              http.authorizeHttpRequests(
@@ -21,8 +20,4 @@ public class SecurityConfiguration {
             .csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }
-     
-    //@Bean
-    //public WebSecurityCustomizer webSecurityCustomizer() { }
-         
 }

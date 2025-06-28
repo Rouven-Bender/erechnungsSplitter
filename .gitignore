@@ -7,3 +7,4 @@ node_modules/*
 src/main/resources/static/style.css
 src/main/resources/static/application.js
 src/main/resources/static/application.css
+src/main/resources/static/pdf.worker.min.mjs
