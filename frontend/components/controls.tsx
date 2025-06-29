@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
 
+type InvoiceData = {
+    invoiceNumber: string;
+    sellerVATID: string;
+    invoiceTotal: string;
+};
 type ControlData = {
     numberOfPDFS: number;
     currentOfPDFS: number;
+    invoice: InvoiceData | undefined;
 };
 
 export default function Controls(){
@@ -23,9 +29,20 @@ export default function Controls(){
 
     return(
         <div>
-            <p>Controls</p>
-            <p>Anzahl von PDF's: {data?.numberOfPDFS}</p>
-            <p>Aktuelle PDF: {data?.currentOfPDFS}</p>
+            <p>PDF: {data?.currentOfPDFS} / {data?.numberOfPDFS}</p>
+            <form>
+                <label className="pr-2">Rechnungsbetrag:</label>
+                <input name="invoicetotal" type="text" 
+                    value={data?.invoice?.invoiceTotal}
+                    disabled={data?.invoice?.invoiceTotal != "" ? true : false}
+                ></input><br/>
+
+                <label className="pr-2">Rechnungsnummer:</label>
+                <input name="invoicetotal" type="text" 
+                    value={data?.invoice?.invoiceNumber}
+                    disabled={data?.invoice?.invoiceNumber != "" ? true : false}
+                ></input><br/>
+            </form>
         </div>
     )
 }

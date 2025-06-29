@@ -26,14 +26,16 @@ class RestAPI {
         //TODO: Make this configurable
         basepath = Paths.get(System.getProperty("user.home"), "src", "erechnungsSplitter").toString();
         path = new File(basepath);
+
         refreshPDFSGlobal();
     }
 
     @GetMapping("/ui")
-    Display getUIState(){
+    Display getDataForUI(){
         Display out = new Display();
         out.currentOfPDFS = selected + 1;
         out.numberOfPDFS = pdfs.size();
+        out.invoice = Zugferd.getInvoiceData(pdfs.get(selected)).orElse(null);
         return out;
     }
 
