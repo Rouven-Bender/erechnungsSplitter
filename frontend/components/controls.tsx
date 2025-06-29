@@ -31,14 +31,14 @@ export default function Controls(){
         <div>
             <p>PDF: {data?.currentOfPDFS} / {data?.numberOfPDFS}</p>
             <form>
-                <label className="pr-2">Rechnungsbetrag:</label>
-                <input name="invoicetotal" type="text" 
+                <label className="pr-2" htmlFor="invoicetotal">Rechnungsbetrag:</label>
+                <input name="invoicetotal" type="text" id="invoicetotal"
                     value={data?.invoice?.invoiceTotal}
                     disabled={data?.invoice?.invoiceTotal != "" ? true : false}
                 ></input><br/>
 
-                <label className="pr-2">Rechnungsnummer:</label>
-                <input name="invoicetotal" type="text" 
+                <label htmlFor="invoicenumber" className="pr-2">Rechnungsnummer:</label>
+                <input name="invoicenumber" type="text" id="invoicenumber"
                     value={data?.invoice?.invoiceNumber}
                     disabled={data?.invoice?.invoiceNumber != "" ? true : false}
                 ></input><br/>
