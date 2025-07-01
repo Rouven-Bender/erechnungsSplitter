@@ -34,6 +34,11 @@ class RestAPI {
 
     @GetMapping("/ui")
     Display getDataForUI(){
+        if (selected == -1) {
+            Display d = new Display();
+            d.msg = "Alle Rechnungen gebucht";
+            return d;
+        }
         Display out = new Display();
         out.currentOfPDFS = selected + 1;
         out.numberOfPDFS = pdfs.size();
@@ -56,6 +61,8 @@ class RestAPI {
         System.out.println(request.account); //TODO: save this to a database
         if (selected + 1 < pdfs.size()) {
             selected++;
+        } else {
+            selected = -1;
         }
         return 200;
     }

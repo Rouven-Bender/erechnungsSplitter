@@ -13,6 +13,7 @@ export type ControlData = {
     currentOfPDFS: number;
     invoice: InvoiceData | undefined;
     accounts: Account[] | undefined;
+    msg: string | undefined;
 };
 
 export type SenderReciever = {

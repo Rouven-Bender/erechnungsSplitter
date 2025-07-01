@@ -74,6 +74,7 @@ function Application(){
                     <label><input name="fullBookingToogle"
                         type="checkbox" checked={bookFullInvoice} onChange={toggleBookFullInvoice}></input> Volle Rechnung auf Konto</label>
                     {booker}
+                    {data?.msg ? <p>{data.msg}</p> : ""}
                 </div>
             </div>
 		</div>

@@ -5,4 +5,5 @@ public class Display {
     public int currentOfPDFS;
     public InvoiceData invoice;
     public Accounts[] accounts;
+    public String msg;
 }
