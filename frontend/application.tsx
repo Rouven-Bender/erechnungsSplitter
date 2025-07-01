@@ -9,6 +9,7 @@ import { Account, ControlData } from "./types";
 function Application(){
     const [data, setData] = useState<ControlData>()
     const [bookFullInvoice, setBookFullInvoice] = useState(true);
+    const [render, setRender] = useState(0)
 
     useEffect(() => {
         async function f() {
@@ -20,7 +21,7 @@ function Application(){
            }
         }
         f();
-    }, [])
+    }, [render])
 
     function toggleBookFullInvoice() {
         setBookFullInvoice(!bookFullInvoice)
@@ -37,6 +38,7 @@ function Application(){
                     "Content-Type": "application/json"
                 }
             })
+            setRender(render+1)
         }
         let account = formdata.get("account")
         f(account)

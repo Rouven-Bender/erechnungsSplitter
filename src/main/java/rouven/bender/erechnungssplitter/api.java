@@ -52,8 +52,12 @@ class RestAPI {
     }
 
     @PostMapping("/book")
-    void book(@RequestBody BookingRequest request) {
+    int book(@RequestBody BookingRequest request) {
         System.out.println(request.account); //TODO: save this to a database
+        if (selected + 1 < pdfs.size()) {
+            selected++;
+        }
+        return 200;
     }
     
     @GetMapping("/pwd")
