@@ -4,7 +4,7 @@ import {createRoot} from 'react-dom/client';
 //import FileTree from "./components/filetree";
 import { PDFDisplay } from "./components/PDFDisplay";
 
-import { ControlData } from "./types";
+import { Account, ControlData } from "./types";
 
 function Application(){
     const [data, setData] = useState<ControlData>()
@@ -26,9 +26,36 @@ function Application(){
         setBookFullInvoice(!bookFullInvoice)
     }
 
+    function book(formdata) {
+        async function f(account) {
+            await fetch("/book", {
+                method: "POST",
+                body: JSON.stringify({
+                    account: account
+                }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+        }
+        let account = formdata.get("account")
+        f(account)
+    }
+
     if (bookFullInvoice) {
         var booker = (
-            <div><p>Full invoice booking</p></div>
+            <form action={book}>
+                <label htmlFor="account">Konto für Rechnung: <br/></label>
+                <select name="account" id="account" className="border border-1">
+                    {data?.accounts?.map((row : Account, idx : number) => {
+                       return (
+                            <option key={idx} value={row.accountNumber}>{row.accountNumber} : {row.name}</option>
+                       ) 
+                    })}
+                </select>
+                <br/><br/>
+                <button type="submit">Buchen</button>
+            </form>
         )
     } else {
         var booker = (

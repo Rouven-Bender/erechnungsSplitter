@@ -12,6 +12,7 @@ export type ControlData = {
     numberOfPDFS: number;
     currentOfPDFS: number;
     invoice: InvoiceData | undefined;
+    accounts: Account[] | undefined;
 };
 
 export type SenderReciever = {
@@ -20,4 +21,9 @@ export type SenderReciever = {
     zip: string;
     location: string;
     country: string;
+};
+
+export type Account = {
+    accountNumber: string;
+    name: string;
 };

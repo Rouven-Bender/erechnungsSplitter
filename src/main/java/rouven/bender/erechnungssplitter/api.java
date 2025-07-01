@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import rouven.bender.erechnungssplitter.models.Accounts;
+import rouven.bender.erechnungssplitter.models.BookingRequest;
 import rouven.bender.erechnungssplitter.models.Display;
 
 @RestController
@@ -36,12 +38,22 @@ class RestAPI {
         out.currentOfPDFS = selected + 1;
         out.numberOfPDFS = pdfs.size();
         out.invoice = Zugferd.getInvoiceData(pdfs.get(selected)).orElse(null);
+        out.accounts = new Accounts[]{
+            new Accounts("Nicht ausgewählt", "----"),
+            new Accounts("Was weiß ich", "8000"),
+            new Accounts("peter lustig", "8500"),
+        };
         return out;
     }
 
     @GetMapping("/reset")
     void reset(){
         path = new File(basepath);
+    }
+
+    @PostMapping("/book")
+    void book(@RequestBody BookingRequest request) {
+        System.out.println(request.account); //TODO: save this to a database
     }
     
     @GetMapping("/pwd")
