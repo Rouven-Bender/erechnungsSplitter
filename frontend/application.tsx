@@ -49,6 +49,7 @@ function Application(){
             <form action={book}>
                 <label htmlFor="account">Konto für Rechnung: <br/></label>
                 <select name="account" id="account" className="border border-1">
+                    <option key={-1} value={"----"}>Bitte Auswählen</option>
                     {data?.accounts?.map((row : Account, idx : number) => {
                        return (
                             <option key={idx} value={row.accountNumber}>{row.accountNumber} : {row.name}</option>

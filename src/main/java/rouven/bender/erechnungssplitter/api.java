@@ -19,14 +19,20 @@ import rouven.bender.erechnungssplitter.models.Display;
 
 @RestController
 class RestAPI {
+    private Config cfg;
     private File path;
     private String basepath;
     private ArrayList<File> pdfs;
     private int selected = 0;
 
+    private Accounts[] accounts = new Accounts[]{
+        new Accounts("Was weiß ich", "8000"), //TODO: move those to a database
+        new Accounts("peter lustig", "8500"),
+    };
+
     RestAPI() {
-        //TODO: Make this configurable
-        basepath = Paths.get(System.getProperty("user.home"), "src", "erechnungsSplitter").toString();
+        cfg = Config.getInstance();
+        basepath = cfg.getSetting("basepath").toString();
         path = new File(basepath);
 
         refreshPDFSGlobal();
@@ -43,11 +49,7 @@ class RestAPI {
         out.currentOfPDFS = selected + 1;
         out.numberOfPDFS = pdfs.size();
         out.invoice = Zugferd.getInvoiceData(pdfs.get(selected)).orElse(null);
-        out.accounts = new Accounts[]{
-            new Accounts("Nicht ausgewählt", "----"),
-            new Accounts("Was weiß ich", "8000"),
-            new Accounts("peter lustig", "8500"),
-        };
+        out.accounts = accounts;
         return out;
     }
 
