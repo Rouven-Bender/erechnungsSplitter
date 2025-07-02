@@ -25,10 +25,7 @@ class RestAPI {
     private ArrayList<File> pdfs;
     private int selected = 0;
 
-    private Accounts[] accounts = new Accounts[]{
-        new Accounts("Was weiß ich", "8000"), //TODO: move those to a database
-        new Accounts("peter lustig", "8500"),
-    };
+    private Accounts[] accounts = Accounts.getAccounts();
 
     RestAPI() {
         cfg = Config.getInstance();
