@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import rouven.bender.erechnungssplitter.models.Accounts;
+import rouven.bender.erechnungssplitter.models.Account;
 import rouven.bender.erechnungssplitter.models.BookingRequest;
 import rouven.bender.erechnungssplitter.models.Display;
 
@@ -25,7 +25,7 @@ class RestAPI {
     private ArrayList<File> pdfs;
     private int selected = 0;
 
-    private Accounts[] accounts = Accounts.getAccounts();
+    private Account[] accounts = Account.getAccounts();
 
     RestAPI() {
         cfg = Config.getInstance();
