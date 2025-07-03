@@ -65,8 +65,31 @@ export function PDFDisplay({invoice}: {invoice : InvoiceData | undefined}){
             </div>
             <div className="pt-2 flex flex-col gap-y-2">
                 <p>Rechnungsnummer: {invoice?.invoiceNumber}</p>
+                <table className="border-1 border-spacing-x-3 border-seperate">
+                    <thead>
+                    <tr>
+                        <th>Produktname</th>
+                        <th>Netto</th>
+                        <th>Anzahl</th>
+                        <th>Gesamt</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {invoice?.positions.map((row, idx)=> {
+                            return (
+                                <tr key={idx}>
+                                    <td>{row.productName}</td>
+                                    <td>{row.netto}</td>
+                                    <td>{row.quantity}</td>
+                                    <td>{row.total}</td>
+                                </tr>
+                            ) 
+                        })}
+                    </tbody>
+                </table>
                 {invoice?.sellerVATID ? <p>Verkäufers VAT ID: {invoice?.sellerVATID}</p> : ""}
                 {invoice?.sellerTaxID ? <p>Verkäufers Steuer ID: {invoice?.sellerTaxID}</p> : ""}
+                <p>Rechnungsbetrag (Netto): {invoice?.invoiceNetto} {invoice?.currency}</p>
                 <p>Rechnungsbetrag: {invoice?.invoiceTotal} {invoice?.currency}</p>
             </div>
             </div>

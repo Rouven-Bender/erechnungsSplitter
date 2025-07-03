@@ -105,7 +105,7 @@ class RestAPI {
 
     @GetMapping(path = "/pdf", produces = "application/pdf")
     ResponseEntity<byte[]> pdf() {
-        File filename = pdfs.get(0);
+        File filename = pdfs.get(selected);
         try (FileInputStream fis = new FileInputStream(filename)){ 
             byte[] out = fis.readAllBytes();
             return ResponseEntity.ok().cacheControl(CacheControl.noCache()).body(out);

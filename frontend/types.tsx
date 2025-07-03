@@ -2,10 +2,12 @@ export type InvoiceData = {
     invoiceNumber: string;
     sellerVATID: string;
     invoiceTotal: string;
+    invoiceNetto: string;
     currency: string;
     sellerTaxID: string;
     sender: SenderReciever;
     reciever: SenderReciever;
+    positions: Position[];
 };
 
 export type ControlData = {
@@ -27,4 +29,12 @@ export type SenderReciever = {
 export type Account = {
     accountNumber: string;
     name: string;
+};
+
+export type Position = {
+    productName: string;
+    netto: string;
+    quantity: string;
+    total: string;
+    //tax: string | undefined;
 };
