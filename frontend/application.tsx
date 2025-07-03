@@ -10,6 +10,7 @@ function Application(){
     const [data, setData] = useState<ControlData>()
     const [bookFullInvoice, setBookFullInvoice] = useState(true);
     const [render, setRender] = useState(0)
+    const [searchterm, setSearchTerm] = useState("");
 
     useEffect(() => {
         async function f() {
@@ -51,12 +52,14 @@ function Application(){
                 <select name="account" id="account" className="border border-1">
                     <option key={-1} value={"----"}>Bitte Auswählen</option>
                     {data?.accounts?.map((row : Account, idx : number) => {
-                       return (
-                            <option key={idx} value={row.accountNumber}>{row.accountNumber} : {row.name}</option>
-                       ) 
+                       if (row.name.toLowerCase().includes(searchterm) || row.accountNumber.toLowerCase().includes(searchterm)){
+                           return (
+                                <option key={idx} value={row.accountNumber}>{row.accountNumber} : {row.name}</option>
+                           ) 
+                       }
                     })}
                 </select>
-                <br/><br/>
+                <br/>
                 <button type="submit">Buchen</button>
             </form>
         )
@@ -66,6 +69,8 @@ function Application(){
         )
     }
 
+    function inputintofilteraccounts(event) { setSearchTerm(event.target.value); }
+
 	return (
 		<div className="grid grid-cols-[max-content_1fr] min-h-screen">
             <PDFDisplay invoice={data?.invoice}/>
@@ -73,7 +78,8 @@ function Application(){
                 <div>
                     <p>PDF: {data?.currentOfPDFS} / {data?.numberOfPDFS}</p>
                     <label><input name="fullBookingToogle"
-                        type="checkbox" checked={bookFullInvoice} onChange={toggleBookFullInvoice}></input> Volle Rechnung auf Konto</label>
+                        type="checkbox" checked={bookFullInvoice} onChange={toggleBookFullInvoice}></input> Volle Rechnung auf Konto</label><br />
+                    <input type="text" placeholder="Filter" onChange={inputintofilteraccounts}/>
                     {booker}
                     {data?.msg ? <p>{data.msg}</p> : ""}
                 </div>
