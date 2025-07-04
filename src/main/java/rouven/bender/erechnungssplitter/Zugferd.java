@@ -14,7 +14,7 @@ import rouven.bender.erechnungssplitter.models.InvoiceData;
 import rouven.bender.erechnungssplitter.models.Position;
 
 public class Zugferd {
-    private static final DecimalFormat df = new DecimalFormat("#,##0.000");
+    private static final DecimalFormat df = new DecimalFormat("#,##0.00#");
 
     public static boolean isZugferdInvoice(File file) {
         ZUGFeRDImporter zu = new ZUGFeRDImporter(file.getPath());
