@@ -42,6 +42,9 @@ function Application(){
             setRender(render+1)
         }
         let account = formdata.get("account")
+        if (account == "") {
+            return
+        }
         f(account)
     }
 
@@ -50,7 +53,7 @@ function Application(){
             <form action={book}>
                 <label htmlFor="account">Konto für Rechnung: <br/></label>
                 <select name="account" id="account" className="border border-1">
-                    <option key={-1} value={"----"}>Bitte Auswählen</option>
+                    <option key={-1} value={""}>Bitte Auswählen</option>
                     {data?.accounts?.map((row : Account, idx : number) => {
                        if (row.name.toLowerCase().includes(searchterm) || row.accountNumber.toLowerCase().includes(searchterm)){
                            return (
@@ -59,8 +62,7 @@ function Application(){
                        }
                     })}
                 </select>
-                <br/>
-                <button type="submit">Buchen</button>
+                <button className="pl-3" type="submit">Buchen</button>
             </form>
         )
     } else {
