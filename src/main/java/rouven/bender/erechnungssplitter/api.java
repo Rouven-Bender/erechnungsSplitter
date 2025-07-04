@@ -57,10 +57,11 @@ class RestAPI {
 
     @PostMapping("/book")
     void book(@RequestBody BookingRequest request) {
-        if (request.account.isBlank()) {
+        if (request.fullInvoice == null && request.accounts == null) {
             return;
         }
-        System.out.println(request.account); //TODO: save this to a database
+        System.out.println(request.fullInvoice);
+        System.out.println(request.accounts); //TODO: save this to a database
         if (selected + 1 < pdfs.size()) {
             selected++;
         } else {

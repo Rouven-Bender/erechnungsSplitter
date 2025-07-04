@@ -32,9 +32,15 @@ export type Account = {
 };
 
 export type Position = {
+    listId: string;
     productName: string;
     netto: string;
     quantity: string;
     total: string;
     //tax: string | undefined;
 };
+
+export type AccountedPosition = {
+    listId: string;
+    accountNumber: string;
+}

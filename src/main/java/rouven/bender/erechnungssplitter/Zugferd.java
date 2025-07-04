@@ -56,6 +56,7 @@ public class Zugferd {
                 out.positions[i] = new Position();
                 Position pos = out.positions[i];
                 Item item = (Item) items[i];
+                pos.listId = item.getId();
                 pos.netto = df.format(item.getPrice());
                 pos.quantity = df.format(item.getQuantity());
                 pos.total = df.format((item.getPrice().multiply(item.getQuantity())));
