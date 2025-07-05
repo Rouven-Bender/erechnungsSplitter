@@ -6,16 +6,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-import org.springframework.http.CacheControl;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
 
-import rouven.bender.erechnungssplitter.models.Account;
-import rouven.bender.erechnungssplitter.models.BookingRequest;
-import rouven.bender.erechnungssplitter.models.Display;
+import rouven.bender.erechnungssplitter.models.*;
 
 @RestController
 class RestAPI {
@@ -24,6 +18,7 @@ class RestAPI {
     private String basepath;
     private ArrayList<File> pdfs;
     private int selected = 0;
+    private Display out;
 
     private Account[] accounts = Account.getAccounts();
 
@@ -42,7 +37,7 @@ class RestAPI {
             d.msg = "Alle Rechnungen gebucht";
             return d;
         }
-        Display out = new Display();
+        out = new Display();
         out.currentOfPDFS = selected + 1;
         out.numberOfPDFS = pdfs.size();
         out.invoice = Zugferd.getInvoiceData(pdfs.get(selected)).orElse(null);
@@ -57,11 +52,26 @@ class RestAPI {
 
     @PostMapping("/book")
     void book(@RequestBody BookingRequest request) {
-        if (request.fullInvoice == null && request.accounts == null) {
+        if (request.fullInvoice == null && request.accounts == null 
+        &&  request.fullInvoice != null && request.accounts != null)
+        {
             return;
         }
-        System.out.println(request.fullInvoice);
-        System.out.println(request.accounts); //TODO: save this to a database
+
+        if (request.fullInvoice != null) {
+            System.out.println(request.fullInvoice);
+        }
+        if (request.accounts != null) {
+            System.out.printf("Rechnungsnumber: %s, ", out.invoice.invoiceNumber);
+            for (int i = 0; i < request.accounts.length; i++) {
+                AccountedPosition p = request.accounts[i];
+                Position ip = out.invoice.positions[Integer.valueOf(p.listId)-1];
+                System.out.printf("Produktname: %s, ", ip.productName);
+                System.out.printf("Position: %s, Accountnummer: %s\n", p.listId, p.accountNumber); //TODO: save this to a database
+            }
+        }
+
+        // Increment after save
         if (selected + 1 < pdfs.size()) {
             selected++;
         } else {
