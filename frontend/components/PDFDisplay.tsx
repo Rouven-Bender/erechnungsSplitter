@@ -7,7 +7,7 @@ import { InvoiceData } from "../types";
 import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 
-export function PDFDisplay({invoice, pdfnumber}: {invoice : InvoiceData | undefined, pdfnumber : number|undefined}){
+export function PDFDisplay({invoice, pdfnumber}: {invoice : InvoiceData | undefined, pdfnumber : number | undefined}){
     const [page, setPage] = useState(1)
     const [pdfview, enablePdfView] = useState(false); //TODO: change to true later
 
@@ -19,6 +19,10 @@ export function PDFDisplay({invoice, pdfnumber}: {invoice : InvoiceData | undefi
     }
     function togglePDFView() {
         enablePdfView(!pdfview);
+    }
+
+    if (pdfnumber == undefined || pdfnumber == 0) {
+        return;
     }
 
     pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
