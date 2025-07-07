@@ -9,3 +9,4 @@ src/main/resources/static/application.js
 src/main/resources/static/application.css
 src/main/resources/static/pdf.worker.min.mjs
 accounts.csv
+datev.csv

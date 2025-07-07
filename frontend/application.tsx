@@ -30,6 +30,10 @@ function Application(){
 
     function book(formdata : FormData) {
         async function f(body) {
+            if (body == "{}") {
+                console.log("Empty json body");
+                return;
+            }
             await fetch("/book", {
                 method: "POST",
                 body: body,
@@ -41,7 +45,7 @@ function Application(){
         }
         if (bookFullInvoice) {
             let account = formdata.get("fullInvoice")
-            if (account?.toString() == "") { 
+            if (account?.toString() == "" || account == undefined) { 
                 if (data != undefined){
                     const temp: ControlData = {
                         numberOfPDFS: data.numberOfPDFS,
@@ -55,36 +59,37 @@ function Application(){
                 return;
             }
             f(JSON.stringify({
-                fullInvoice: account?.toString
+                fullInvoice: account?.toString()
+            }))
+        } else {
+            const body : AccountedPosition[] = [];
+            const i = formdata.entries();
+            for (var row : IteratorResult<[string, FormDataEntryValue], any> = i.next();
+                row.value != undefined; row = i.next())
+                {
+                if (row.value[1] == "") {
+                    if (data != undefined){
+                        const temp: ControlData = {
+                            numberOfPDFS: data.numberOfPDFS,
+                            currentOfPDFS: data.currentOfPDFS,
+                            msg: "Nicht alle Positionen haben ein Konto",
+                            invoice: data.invoice,
+                            accounts: data.accounts,
+                        } 
+                        setData(temp)
+                    }
+                    return
+                }
+                const e : AccountedPosition = {
+                    listId:  row.value[0],
+                    accountNumber: row.value[1]
+                }
+                body.push(e)
+            }
+            f(JSON.stringify({
+                accounts: body
             }))
         }
-        const body : AccountedPosition[] = [];
-        const i = formdata.entries();
-        for (var row : IteratorResult<[string, FormDataEntryValue], any> = i.next();
-             row.value != undefined; row = i.next())
-            {
-            if (row.value[1] == "") {
-                if (data != undefined){
-                    const temp: ControlData = {
-                        numberOfPDFS: data.numberOfPDFS,
-                        currentOfPDFS: data.currentOfPDFS,
-                        msg: "Nicht alle Positionen haben ein Konto",
-                        invoice: data.invoice,
-                        accounts: data.accounts,
-                    } 
-                    setData(temp)
-                }
-                return
-            }
-            const e : AccountedPosition = {
-                listId:  row.value[0],
-                accountNumber: row.value[1]
-            }
-            body.push(e)
-        }
-        f(JSON.stringify({
-            accounts: body
-        }))
     }
 
     if (bookFullInvoice) {

@@ -55,6 +55,7 @@ class RestAPI {
         if (request.fullInvoice == null && request.accounts == null 
         &&  request.fullInvoice != null && request.accounts != null)
         {
+            System.out.println("empty request");
             return;
         }
 
