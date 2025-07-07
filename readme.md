@@ -14,3 +14,5 @@ curl 'https://unpkg.com/pdfjs-dist@5.3.31/build/pdf.worker.min.mjs' > ./src/main
 ~/.config/erechnungssplitter.cfg.properties # settings
 
 {config.basepath}/accounts.csv  # liste der accounts im format {accountnummer, "Account Name"}
+
+{config.basepath}/personenkonto.csv  # liste der personenkonten im format {personen konto name, "Firmenname GmbH"}

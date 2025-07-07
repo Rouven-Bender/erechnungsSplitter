@@ -16,6 +16,7 @@ export type ControlData = {
     invoice: InvoiceData | undefined;
     accounts: Account[] | undefined;
     msg: string | undefined;
+    personenkonto: string | undefined;
 };
 
 export type SenderReciever = {

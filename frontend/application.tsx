@@ -30,10 +30,6 @@ function Application(){
 
     function book(formdata : FormData) {
         async function f(body) {
-            if (body == "{}") {
-                console.log("Empty json body");
-                return;
-            }
             await fetch("/book", {
                 method: "POST",
                 body: body,
@@ -53,6 +49,7 @@ function Application(){
                         msg: "Kein Konto ausgewählt",
                         invoice: data.invoice,
                         accounts: data.accounts,
+                        personenkonto: data.personenkonto
                     }
                     setData(temp)
                 }
@@ -75,6 +72,7 @@ function Application(){
                             msg: "Nicht alle Positionen haben ein Konto",
                             invoice: data.invoice,
                             accounts: data.accounts,
+                            personenkonto: data.personenkonto
                         } 
                         setData(temp)
                     }
@@ -155,8 +153,11 @@ function Application(){
             <PDFDisplay invoice={data?.invoice} pdfnumber={data?.currentOfPDFS}/>
 			<div className="h-full bg-green-200 p-4">
                 <div>
-                    {data?.invoice ? "" : <p>Keine Zugferd Daten enthalten</p>}
                     <p>PDF: {data?.currentOfPDFS} / {data?.numberOfPDFS}</p>
+                    <br/>
+                    {data?.invoice ? "" : <p>Keine Zugferd Daten enthalten</p>}
+                    {data?.personenkonto ? <p>Personenkonto: {data.personenkonto}</p> : <p>Kein Personenkonto für "{data?.invoice?.sender.name}" bekannt</p>}
+                    <br />
                     {data?.invoice == undefined ? <br /> : <div><label><input name="fullBookingToogle"
                         type="checkbox" checked={bookFullInvoice} onChange={toggleBookFullInvoice}></input> Volle Rechnung auf Konto</label><br /></div>}
                     <input type="text" name="Kontofilter" placeholder="Filter" onChange={inputintofilteraccounts}/>

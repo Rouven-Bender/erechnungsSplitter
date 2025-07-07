@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ class RestAPI {
     private Display out;
 
     private Account[] accounts = Account.getAccounts();
+    private HashMap<String, String> Personenkontos = Account.getPersonenkontos();
 
     RestAPI() {
         cfg = Config.getInstance();
@@ -42,6 +44,9 @@ class RestAPI {
         out.numberOfPDFS = pdfs.size();
         out.invoice = Zugferd.getInvoiceData(pdfs.get(selected)).orElse(null);
         out.accounts = accounts;
+        if (out.invoice != null) {
+            out.personenkonto = Personenkontos.get(out.invoice.sender.name);
+        }
         return out;
     }
 
