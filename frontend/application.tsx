@@ -92,7 +92,7 @@ function Application(){
         }
     }
 
-    if (bookFullInvoice) {
+    if (bookFullInvoice || data?.invoice == undefined) {
         var booker = ( 
             <div>
                 <p>Konto für Rechnung: <br/></p>
@@ -155,9 +155,10 @@ function Application(){
             <PDFDisplay invoice={data?.invoice} pdfnumber={data?.currentOfPDFS}/>
 			<div className="h-full bg-green-200 p-4">
                 <div>
+                    {data?.invoice ? "" : <p>Keine Zugferd Daten enthalten</p>}
                     <p>PDF: {data?.currentOfPDFS} / {data?.numberOfPDFS}</p>
-                    <label><input name="fullBookingToogle"
-                        type="checkbox" checked={bookFullInvoice} onChange={toggleBookFullInvoice}></input> Volle Rechnung auf Konto</label><br />
+                    {data?.invoice == undefined ? <br /> : <div><label><input name="fullBookingToogle"
+                        type="checkbox" checked={bookFullInvoice} onChange={toggleBookFullInvoice}></input> Volle Rechnung auf Konto</label><br /></div>}
                     <input type="text" name="Kontofilter" placeholder="Filter" onChange={inputintofilteraccounts}/>
                     <form action={book}>
                         {booker}

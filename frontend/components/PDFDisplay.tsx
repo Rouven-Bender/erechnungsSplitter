@@ -24,16 +24,16 @@ export function PDFDisplay({invoice, pdfnumber}: {invoice : InvoiceData | undefi
     if (pdfnumber == undefined || pdfnumber == 0) {
         return;
     }
-
+    
     pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
-    if (pdfview) {
+    if (pdfview || invoice == undefined) {
         return (
             <div className="h-full bg-blue-200 pt-1.5 pb-1.5 pl-4 pr-4">
                 <div className="mx-auto flex flex-col">
                     <div className="mx-auto">
-                    <label>
+                    {invoice == undefined ? <br /> : <label>
                         <input type="checkbox" name="PDFViewToggle" checked={pdfview} onChange={togglePDFView}></input> PDF Ansicht
-                    </label>
+                    </label>}
                     </div>
                     <Document file={"/pdf/"+pdfnumber}>
                         <Page pageNumber={page} />
