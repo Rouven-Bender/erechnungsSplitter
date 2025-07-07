@@ -152,7 +152,7 @@ function Application(){
 
 	return (
 		<div className="grid grid-cols-[max-content_1fr] min-h-screen">
-            <PDFDisplay invoice={data?.invoice}/>
+            <PDFDisplay invoice={data?.invoice} pdfnumber={data?.currentOfPDFS}/>
 			<div className="h-full bg-green-200 p-4">
                 <div>
                     <p>PDF: {data?.currentOfPDFS} / {data?.numberOfPDFS}</p>

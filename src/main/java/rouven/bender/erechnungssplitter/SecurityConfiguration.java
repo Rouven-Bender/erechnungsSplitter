@@ -14,7 +14,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
              http.authorizeHttpRequests(
                 authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
-                .requestMatchers("/*")
+                .requestMatchers("/**")
                     .access(new WebExpressionAuthorizationManager("hasIpAddress('::1') || hasIpAddress('127.0.0.1')")).anyRequest())
             .formLogin(AbstractAuthenticationFilterConfigurer::permitAll)
             .csrf(AbstractHttpConfigurer::disable);

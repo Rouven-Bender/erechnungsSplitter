@@ -7,7 +7,7 @@ import { InvoiceData } from "../types";
 import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 
-export function PDFDisplay({invoice}: {invoice : InvoiceData | undefined}){
+export function PDFDisplay({invoice, pdfnumber}: {invoice : InvoiceData | undefined, pdfnumber : number|undefined}){
     const [page, setPage] = useState(1)
     const [pdfview, enablePdfView] = useState(false); //TODO: change to true later
 
@@ -31,7 +31,7 @@ export function PDFDisplay({invoice}: {invoice : InvoiceData | undefined}){
                         <input type="checkbox" name="PDFViewToggle" checked={pdfview} onChange={togglePDFView}></input> PDF Ansicht
                     </label>
                     </div>
-                    <Document file="/pdf">
+                    <Document file={"/pdf/"+pdfnumber}>
                         <Page pageNumber={page} />
                     </Document>
                     <div className="flex flex-row pt-2">

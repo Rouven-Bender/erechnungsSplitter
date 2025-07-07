@@ -117,9 +117,10 @@ class RestAPI {
         }
     }
 
-    @GetMapping(path = "/pdf", produces = "application/pdf")
-    ResponseEntity<byte[]> pdf() {
-        File filename = pdfs.get(selected);
+    // ID is 1 indexed so the frontend can use currentPDF as the pdf id
+    @GetMapping(path = "/pdf/{id}", produces = "application/pdf")
+    ResponseEntity<byte[]> pdf(@PathVariable("id") int id) {
+        File filename = pdfs.get(id-1);
         try (FileInputStream fis = new FileInputStream(filename)){ 
             byte[] out = fis.readAllBytes();
             return ResponseEntity.ok().cacheControl(CacheControl.noCache()).body(out);
