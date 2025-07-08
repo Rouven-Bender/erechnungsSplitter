@@ -14,6 +14,7 @@
 				pkgs.mkShell
 				{
 					buildInputs = [
+						pkgs.sqlite
 						pkgs.poppler_utils
 						pkgs.zulu23
 						pkgs.maven

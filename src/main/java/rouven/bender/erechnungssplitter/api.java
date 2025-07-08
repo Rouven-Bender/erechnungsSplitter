@@ -15,19 +15,29 @@ import rouven.bender.erechnungssplitter.models.*;
 @RestController
 class RestAPI {
     private Config cfg;
+    private database db;
+
     private File path;
     private String basepath;
     private ArrayList<File> pdfs;
     private int selected = 0;
     private Display out;
 
-    private Account[] accounts = Account.getAccounts();
-    private HashMap<String, String> Personenkontos = Account.getPersonenkontos();
+    private Account[] accounts;
+    private HashMap<String, String> Personenkontos;
 
     RestAPI() {
         cfg = Config.getInstance();
         basepath = cfg.getSetting("basepath").toString();
         path = new File(basepath);
+
+        db = database.getInstance();
+        accounts = db.getAccounts().orElse(null);
+        Personenkontos = db.getPersonenkonten().orElse(null);
+        if (accounts == null || Personenkontos == null) {
+            System.out.println("Konten oder Personenkonten konnten nicht geladen werden");
+            System.exit(1);
+        }
 
         refreshPDFSGlobal();
     }
