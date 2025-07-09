@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -74,20 +75,39 @@ class RestAPI {
             return;
         }
 
-        if (request.fullInvoice != null) {
-            System.out.println(request.fullInvoice);
-        }
-        if (request.accounts != null) {
-            System.out.printf("Rechnungsnumber: %s, ", out.invoice.invoiceNumber);
-            for (int i = 0; i < request.accounts.length; i++) {
-                AccountedPosition p = request.accounts[i];
-                Position ip = out.invoice.positions[Integer.valueOf(p.listId)-1];
-                System.out.printf("Produktname: %s, ", ip.productName);
-                System.out.printf("Position: %s, Accountnummer: %s\n", p.listId, p.accountNumber); //TODO: save this to a database
+
+        if (out == null || out.invoice == null) {
+            System.out.println("can't book this invoice");
+        } else {
+            if (request.fullInvoice != null) {
+                AccountingRow row = new AccountingRow();
+                row.betrag = out.invoice.invoiceTotal;
+                row.datum = out.invoice.datum;
+                row.rechnungsnummer = out.invoice.invoiceNumber;
+                row.text = out.invoice.sender.name;
+                row.personenkonto = Personenkontos.get(out.invoice.sender.name); //TODO: check if empty
+                row.aufwandskonto = request.fullInvoice;
+
+                try {
+                    if (!db.bookAccountingRow(row)){
+                        System.out.println("booking to database failed");
+                    }
+                } catch(SQLException e) {
+                    System.out.println(e);
+                }
+            }
+            if (request.accounts != null) {
+                System.out.printf("Rechnungsnumber: %s, ", out.invoice.invoiceNumber);
+                for (int i = 0; i < request.accounts.length; i++) {
+                    AccountedPosition p = request.accounts[i];
+                    Position ip = out.invoice.positions[Integer.valueOf(p.listId) - 1];
+                    System.out.printf("Produktname: %s, ", ip.productName);
+                    System.out.printf("Position: %s, Accountnummer: %s\n", p.listId, p.accountNumber); // TODO: save this to a database
+                }
             }
         }
 
-        // Increment after save
+         // Increment after save
         if (selected + 1 < pdfs.size()) {
             selected++;
         } else {

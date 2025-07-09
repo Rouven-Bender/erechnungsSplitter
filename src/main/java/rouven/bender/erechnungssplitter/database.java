@@ -1,16 +1,10 @@
 package rouven.bender.erechnungssplitter;
 
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Optional;
+import java.sql.*;
+import java.util.*;
 
-import rouven.bender.erechnungssplitter.models.Account;
+import rouven.bender.erechnungssplitter.models.*;
 
 public class database {
     private static database instance;
@@ -33,6 +27,28 @@ public class database {
             }
         }
         return instance;
+    }
+
+    /**
+     * 
+     * @param row
+     * @return true if success, false for failure
+     * @throws SQLException
+     */
+    public boolean bookAccountingRow(AccountingRow row) throws SQLException {
+        try (PreparedStatement stmt = con.prepareStatement(
+            "insert into bookings (betrag, datum, rechnungsnummer, werundwas, personenkonto, aufwandskonto) values (?,?,?,?,?,?)"
+        )) {
+            stmt.setString(1, row.betrag);
+            stmt.setString(2, row.datum);
+            stmt.setString(3, row.rechnungsnummer);
+            stmt.setString(4, row.text);
+            stmt.setString(5, row.personenkonto);
+            stmt.setString(6, row.aufwandskonto);
+            return (stmt.executeUpdate() == 1);
+        } catch(SQLException e) {
+            throw e;
+        }
     }
 
     public Optional<Account[]> getAccounts() {
