@@ -50,6 +50,18 @@ public class Zugferd {
             out.currency = iv.getCurrency();
             out.invoiceNetto = zu.getTaxBasisTotalAmount();
 
+            String d = zu.getIssueDate(); //Format YYYYMMDD (maybe mostly we dont now)
+            if (d == "" || d == null || d.length() != 8) {
+                out.datum = "";
+            } else {
+                out.datum = String.format(
+                    "%s-%s-%s",
+                    d.substring(0, 4),
+                    d.substring(4, 6),
+                    d.substring(6, 8)
+                    );
+            }
+
             IZUGFeRDExportableItem[] items = iv.getZFItems();
             out.positions = new Position[items.length];
             for (int i=0; i < items.length; i++) {

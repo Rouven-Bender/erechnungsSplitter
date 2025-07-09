@@ -7,6 +7,7 @@ export type InvoiceData = {
     sellerTaxID: string;
     sender: SenderReciever;
     reciever: SenderReciever;
+    datum: string;
     positions: Position[];
 };
 
