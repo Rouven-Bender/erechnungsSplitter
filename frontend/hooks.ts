@@ -23,10 +23,10 @@ export function useRetryFetch<T = unknown>(
         try {
           const response = await fetch(url, options);
 
-          if (response.status === 425) {
+          if (response.status != 200) {
             retries++;
             console.warn(
-              `Received 425 Too Early. Retrying in ${retryDelay}ms... (Attempt ${retries}/${maxRetries})`
+              `Received ${response.status}. Retrying in ${retryDelay}ms... (Attempt ${retries}/${maxRetries})`
             );
             await new Promise((res) => setTimeout(res, retryDelay));
             continue;
