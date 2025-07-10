@@ -28,7 +28,7 @@ export function PDFDisplay({invoice, pdfnumber}: {invoice : InvoiceData | undefi
     pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
     if (pdfview || invoice == undefined) {
         return (
-            <div className="h-full bg-blue-200 pt-1.5 pb-1.5 pl-4 pr-4">
+            <div className="h-full pt-1.5 pb-1.5 pl-4 pr-4">
                 <div className="mx-auto flex flex-col">
                     <div className="mx-auto">
                     {invoice == undefined ? <br /> : <label>
