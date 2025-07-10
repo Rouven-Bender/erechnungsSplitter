@@ -51,6 +51,18 @@ public class database {
         }
     }
 
+    public void addPersonenkonto(Account a) throws SQLException {
+        try (PreparedStatement stmt = con.prepareStatement(
+            "insert into personenkonto (kontonumber, aname) values (?, ?)"
+        )) {
+            stmt.setString(1, a.accountNumber);
+            stmt.setString(2, a.name);
+            stmt.executeUpdate();
+        } catch(SQLException e){
+            throw e;
+        }
+    }
+
     public Optional<Account[]> getAccounts() {
         ArrayList<Account> tmp = new ArrayList<>();
         try (PreparedStatement stmt = con.prepareStatement("select * from account")) {
@@ -61,10 +73,10 @@ public class database {
                     rs.getString("accountnumber")
                 ));
             }
+            return Optional.of(tmp.toArray(new Account[0]));
         } catch (SQLException e) {
             return Optional.empty();
         }
-        return Optional.of(tmp.toArray(new Account[0]));
     }
 
     public Optional<HashMap<String,String>> getPersonenkonten() {
@@ -74,9 +86,9 @@ public class database {
             while (rs.next()) {
                 out.put(rs.getString("aname"), rs.getString("kontonumber"));
             }
+            return Optional.of(out);
         } catch (SQLException e) {
             return Optional.empty();
         }
-        return Optional.of(out);
     }
 }

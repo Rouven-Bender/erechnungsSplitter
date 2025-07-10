@@ -46,3 +46,7 @@ export type AccountedPosition = {
     listId: string;
     accountNumber: string;
 }
+
+export type PersonenkontoRsp = {
+    personenkonto: string;
+}

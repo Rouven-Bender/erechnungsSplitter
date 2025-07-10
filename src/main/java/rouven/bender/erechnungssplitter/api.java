@@ -43,6 +43,19 @@ class RestAPI {
         refreshPDFSGlobal();
     }
 
+    @GetMapping("/ui/personenkonto") 
+    ResponseEntity<personenkonto> getPersonenkonto(){
+        if (out != null ) {
+            if (out.invoice != null) {
+            String p = Personenkontos.get(out.invoice.sender.name);
+            if (p == null) {
+                p = "";
+            }
+            return ResponseEntity.ok().body(new personenkonto(p));
+        }}
+        return new ResponseEntity<>(HttpStatus.TOO_EARLY);
+    }
+
     @GetMapping("/ui")
     Display getDataForUI(){
         if (selected == -1) {
@@ -59,6 +72,24 @@ class RestAPI {
             out.personenkonto = Personenkontos.get(out.invoice.sender.name);
         }
         return out;
+    }
+
+    @PostMapping("/add/personenkonto")
+    ResponseEntity<?> addPersonenkonto(@RequestBody Account toAdd) {
+        if (toAdd.name == "" 
+            || toAdd.accountNumber == ""
+            || !toAdd.accountNumber.matches("[0-9]*")
+         ) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            db.addPersonenkonto(toAdd);
+            Personenkontos.put(toAdd.name, toAdd.accountNumber);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/reset")
@@ -79,7 +110,7 @@ class RestAPI {
         if (out == null || out.invoice == null) {
             System.out.println("can't book this invoice");
         } else {
-            if (request.fullInvoice != null) {
+            if (request.fullInvoice != null) { //TODO: maybe switch to having only accounts and the full invoice case is then just an array with one item much like an invoice with only one item
                 AccountingRow row = new AccountingRow();
                 row.betrag = out.invoice.invoiceTotal;
                 row.datum = out.invoice.datum;

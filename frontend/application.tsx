@@ -3,6 +3,7 @@ import {createRoot} from 'react-dom/client';
 
 //import FileTree from "./components/filetree";
 import { PDFDisplay } from "./components/PDFDisplay";
+import Personenkonto from "./components/personenkonto";
 
 import { Account, ControlData, AccountedPosition } from "./types";
 
@@ -15,7 +16,7 @@ function Application(){
     useEffect(() => {
         async function f() {
            try {
-                var response = await fetch('/ui')
+                var response = await fetch('/ui') //TODO: I am basicly doing toplevel app state here which I shouldn't
                 setData(await response.json())
            } catch(err) {
                 console.log(err.message)
@@ -151,12 +152,12 @@ function Application(){
 	return (
 		<div className="grid grid-cols-[max-content_1fr] min-h-screen">
             <PDFDisplay invoice={data?.invoice} pdfnumber={data?.currentOfPDFS}/>
-			<div className="h-full bg-green-200 p-4">
+			<div className="h-full p-4">
                 <div>
                     <p>PDF: {data?.currentOfPDFS} / {data?.numberOfPDFS}</p>
                     <br/>
                     {data?.invoice ? "" : <p>Keine Zugferd Daten enthalten</p>}
-                    {data?.personenkonto ? <p>Personenkonto: {data.personenkonto}</p> : <p>Kein Personenkonto für "{data?.invoice?.sender.name}" bekannt</p>}
+                    <Personenkonto sender={data?.invoice?.sender.name}/>
                     <br />
                     {data?.invoice == undefined ? <br /> : <div><label><input name="fullBookingToogle"
                         type="checkbox" checked={bookFullInvoice} onChange={toggleBookFullInvoice}></input> Volle Rechnung auf Konto</label><br /></div>}
