@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from "react";
 
 import { Account, PersonenkontoRsp } from "../types";
-import { useRetryFetch } from "../hooks";
+import { useParams } from "react-router-dom";
 
 export default function Personenkonto({sender} : {sender : string | undefined}) {
-    let { data, error } = useRetryFetch<PersonenkontoRsp>('/ui/personenkonto', {}, 1000, 2)
+    const { id } = useParams()
+    let [ data, setData ] = useState<PersonenkontoRsp>()
     const [ addForm, setAddForm ] = useState(false)
     const [ errormsg, setErrorMsg ] = useState("")
     const [ render, setRender] = useState(0);
+
+    useEffect(() => {
+        try {
+            fetch("/ui/personenkonto/"+id?.toString()).then(rsp => {return rsp.json()}).then(json => {setData(json)})
+        } catch (err) {
+            console.log(err.message)
+        }
+    }, [id])
 
     function addPersonenkonto(formdata : FormData) {
         let k = formdata.get("personenkonto")
@@ -46,7 +55,7 @@ export default function Personenkonto({sender} : {sender : string | undefined}) 
         }
     }
 
-    if (error || data?.personenkonto.length == 0) {
+    if (data == undefined || data?.personenkonto || data?.personenkonto?.length == 0) {
         if (addForm) {
             return (
                 <form action={addPersonenkonto}>

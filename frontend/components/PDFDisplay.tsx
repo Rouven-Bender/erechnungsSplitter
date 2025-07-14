@@ -6,25 +6,42 @@ import { InvoiceData } from "../types";
 
 import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
+import { useParams } from "react-router-dom";
 
-export function PDFDisplay({invoice, pdfnumber}: {invoice : InvoiceData | undefined, pdfnumber : number | undefined}){
+export function PDFDisplay(){
+    const { id } = useParams();
     const [page, setPage] = useState(1)
     const [pdfview, enablePdfView] = useState(false); //TODO: change to true later
+
+    const [numberofPDFs, setNumberofPDFs] = useState(0)
+    const [invoice, setInvoiceData] = useState<InvoiceData>();
+
+
+    useEffect(() => {
+        try {
+            fetch("/ui/numberofPDFs").then(response => {return response.text()}).then(text => {setNumberofPDFs(parseInt(text))})
+            fetch("/ui/invoicedata/" + id).then(Response => {return Response.json()}).then(json => {setInvoiceData(json)})
+        } catch (err) {
+            console.log(err.message)
+        }
+    }, [id])
 
     function nextPage(){
         setPage(page+1);
     }
+
     function prevPage(){
         setPage(page-1);
     }
+
     function togglePDFView() {
         enablePdfView(!pdfview);
     }
 
-    if (pdfnumber == undefined || pdfnumber == 0) {
+    if (id == undefined || parseInt(id) > numberofPDFs) {
         return;
     }
-    
+
     pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
     if (pdfview || invoice == undefined) {
         return (
@@ -35,7 +52,7 @@ export function PDFDisplay({invoice, pdfnumber}: {invoice : InvoiceData | undefi
                         <input type="checkbox" name="PDFViewToggle" checked={pdfview} onChange={togglePDFView}></input> PDF Ansicht
                     </label>}
                     </div>
-                    <Document file={"/pdf/"+pdfnumber}>
+                    <Document file={"/pdf/"+id}>
                         <Page pageNumber={page} />
                     </Document>
                     <div className="flex flex-row pt-2">
@@ -69,7 +86,7 @@ export function PDFDisplay({invoice, pdfnumber}: {invoice : InvoiceData | undefi
             </div>
             <div className="pt-2 flex flex-col gap-y-2">
                 <p>Rechnungsnummer: {invoice?.invoiceNumber}</p>
-                <p>Rechnungsdatum: <input name="rechungsdatum" type="date" value={invoice.datum} disabled={true}/></p>
+                <p>Rechnungsdatum: <input name="rechungsdatum" type="date" value={invoice.datum?.toString()} disabled={true}/></p>
                 <table className="border-1 border-spacing-x-3 border-seperate">
                     <thead>
                     <tr>
@@ -80,7 +97,7 @@ export function PDFDisplay({invoice, pdfnumber}: {invoice : InvoiceData | undefi
                     </tr>
                     </thead>
                     <tbody>
-                        {invoice?.positions.map((row, idx)=> {
+                        {invoice?.positions?.map((row, idx)=> {
                             return (
                                 <tr key={idx}>
                                     <td>{row.productName}</td>

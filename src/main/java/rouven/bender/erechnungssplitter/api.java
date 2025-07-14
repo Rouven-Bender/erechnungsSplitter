@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +22,7 @@ class RestAPI {
     private File path;
     private String basepath;
     private ArrayList<File> pdfs;
-    private int selected = 0;
-    private Display out;
+    private ArrayList<InvoiceData> invoiceDatas;
 
     private Account[] accounts;
     private HashMap<String, String> Personenkontos;
@@ -43,47 +43,36 @@ class RestAPI {
         refreshPDFSGlobal();
     }
 
-    @GetMapping("/back")
-    void back(){
-        if (selected > 0) {
-            selected--;
+    // returns empty json for invoices that don't exist
+    @GetMapping("/ui/invoicedata/{id}")
+    InvoiceData getInvoicedata(@PathVariable("id") int id) {
+        if (id < invoiceDatas.size() && id >= 0){
+            return Optional.ofNullable(invoiceDatas.get(id)).orElse(new InvoiceData());
         }
+        return new InvoiceData();
     }
 
-    @GetMapping("/skip")
-    void skip(){
-        selected++;
-    }
-
-    @GetMapping("/ui/personenkonto") 
-    ResponseEntity<personenkonto> getPersonenkonto(){
-        if (out != null ) {
-            if (out.invoice != null) {
-            String p = Personenkontos.get(out.invoice.sender.name);
-            if (p == null) {
-                p = "";
+    @GetMapping("/ui/personenkonto/{id}") 
+    personenkonto getPersonenkonto(@PathVariable("id") int id){
+        if (id < invoiceDatas.size()){
+            InvoiceData iv = invoiceDatas.get(id);
+            if (iv == null) {
+                return new personenkonto("");
             }
-            return ResponseEntity.ok().body(new personenkonto(p));
-        }}
-        return new ResponseEntity<>(HttpStatus.TOO_EARLY);
+            return new personenkonto(Personenkontos.get(iv.sender.name));
+        }
+        return new personenkonto("");
     }
 
-    @GetMapping("/ui")
-    Display getDataForUI(){
-        if (selected == -1) {
-            Display d = new Display();
-            d.msg = "Alle Rechnungen gebucht";
-            return d;
-        }
-        out = new Display();
-        out.currentOfPDFS = selected + 1;
-        out.numberOfPDFS = pdfs.size();
-        out.invoice = Zugferd.getInvoiceData(pdfs.get(selected)).orElse(null);
-        out.accounts = accounts;
-        if (out.invoice != null) {
-            out.personenkonto = Personenkontos.get(out.invoice.sender.name);
-        }
-        return out;
+    @GetMapping("/ui/accounts")
+    Account[] getAccounts() {
+        return accounts;
+    }
+
+    //TODO: turn into json endpoint
+    @GetMapping("/ui/numberofPDFs")
+    int getNumberOfPDFS() {
+        return pdfs.size();
     }
 
     @PostMapping("/add/personenkonto")
@@ -109,37 +98,31 @@ class RestAPI {
         path = new File(basepath);
     }
 
-    @PostMapping("/book")
-    void book(@RequestBody BookingRequest request) {
+    @PostMapping("/book/{id}")
+    void book(@RequestBody BookingRequest request, @PathVariable("id") int id) {
         if (request.accounts == null)
         {
             System.out.println("empty request");
             return;
         }
 
-        if (out == null || out.invoice == null) {
+        if (invoiceDatas.get(id) == null) {
             System.out.println("can't book this invoice");
-        } else {
-            if (request.accounts != null) {
-                if (request.accounts[0].listId.equals("0")) {
-                    System.out.printf("Ganze Rechnung: %s", request.accounts[0].accountNumber);
-                } else {
-                    System.out.printf("Rechnungsnumber: %s, ", out.invoice.invoiceNumber);
-                    for (int i = 0; i < request.accounts.length; i++) {
-                        AccountedPosition p = request.accounts[i];
-                        Position ip = out.invoice.positions[Integer.valueOf(p.listId) - 1];
-                        System.out.printf("Produktname: %s, ", ip.productName);
-                        System.out.printf("Position: %s, Accountnummer: %s\n", p.listId, p.accountNumber); // TODO: save this to a database
-                    }
-                }
-            }
+            return;
         }
 
-         // Increment after save
-        if (selected + 1 < pdfs.size()) {
-            selected++;
-        } else {
-            selected = -1;
+        if (request.accounts != null) {
+            if (request.accounts[0].listId.equals("0")) {
+                System.out.printf("Ganze Rechnung: %s", request.accounts[0].accountNumber);
+            } else {
+                System.out.printf("Rechnungsnumber: %s, ", invoiceDatas.get(id).invoiceNumber);
+                for (int i = 0; i < request.accounts.length; i++) {
+                    AccountedPosition p = request.accounts[i];
+                    Position ip = invoiceDatas.get(id).positions[Integer.valueOf(p.listId) - 1];
+                    System.out.printf("Produktname: %s, ", ip.productName);
+                    System.out.printf("Position: %s, Accountnummer: %s\n", p.listId, p.accountNumber); // TODO: save this to a database
+                }
+            }
         }
     }
     
@@ -178,12 +161,15 @@ class RestAPI {
                 pdfs.add(fs[i]);
             }
         }
+        invoiceDatas = new ArrayList<>();
+        for (int i=0; i<pdfs.size(); i++) {
+            invoiceDatas.add(i, Zugferd.getInvoiceData(pdfs.get(i)).orElse(null));
+        }
     }
 
     // ID is 1 indexed so the frontend can use currentPDF as the pdf id
     @GetMapping(path = "/pdf/{id}", produces = "application/pdf")
     ResponseEntity<byte[]> pdf(@PathVariable("id") int id) {
-        id = id-1;
         if (id < 0 || id > pdfs.size()) {
             return ResponseEntity.badRequest().body(new byte[]{});
         }

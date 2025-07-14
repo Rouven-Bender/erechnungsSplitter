@@ -1,23 +1,14 @@
 export type InvoiceData = {
-    invoiceNumber: string;
-    sellerVATID: string;
-    invoiceTotal: string;
-    invoiceNetto: string;
-    currency: string;
-    sellerTaxID: string;
-    sender: SenderReciever;
-    reciever: SenderReciever;
-    datum: string;
-    positions: Position[];
-};
-
-export type ControlData = {
-    numberOfPDFS: number;
-    currentOfPDFS: number;
-    invoice: InvoiceData | undefined;
-    accounts: Account[] | undefined;
-    msg: string | undefined;
-    personenkonto: string | undefined;
+    invoiceNumber: string | null;
+    sellerVATID: string | null;
+    invoiceTotal: string | null;
+    invoiceNetto: string | null;
+    currency: string | null;
+    sellerTaxID: string | null;
+    sender: SenderReciever | null;
+    reciever: SenderReciever | null;
+    datum: string | null;
+    positions: Position[] | null;
 };
 
 export type SenderReciever = {
@@ -48,5 +39,5 @@ export type AccountedPosition = {
 }
 
 export type PersonenkontoRsp = {
-    personenkonto: string;
+    personenkonto: string | null;
 }
