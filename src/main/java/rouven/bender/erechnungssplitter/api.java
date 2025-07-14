@@ -99,41 +99,26 @@ class RestAPI {
 
     @PostMapping("/book")
     void book(@RequestBody BookingRequest request) {
-        if (request.fullInvoice == null && request.accounts == null 
-        &&  request.fullInvoice != null && request.accounts != null)
+        if (request.accounts == null)
         {
             System.out.println("empty request");
             return;
         }
 
-
         if (out == null || out.invoice == null) {
             System.out.println("can't book this invoice");
         } else {
-            if (request.fullInvoice != null) { //TODO: maybe switch to having only accounts and the full invoice case is then just an array with one item much like an invoice with only one item
-                AccountingRow row = new AccountingRow();
-                row.betrag = out.invoice.invoiceTotal;
-                row.datum = out.invoice.datum;
-                row.rechnungsnummer = out.invoice.invoiceNumber;
-                row.text = out.invoice.sender.name;
-                row.personenkonto = Personenkontos.get(out.invoice.sender.name); //TODO: check if empty
-                row.aufwandskonto = request.fullInvoice;
-
-                try {
-                    if (!db.bookAccountingRow(row)){
-                        System.out.println("booking to database failed");
-                    }
-                } catch(SQLException e) {
-                    System.out.println(e);
-                }
-            }
             if (request.accounts != null) {
-                System.out.printf("Rechnungsnumber: %s, ", out.invoice.invoiceNumber);
-                for (int i = 0; i < request.accounts.length; i++) {
-                    AccountedPosition p = request.accounts[i];
-                    Position ip = out.invoice.positions[Integer.valueOf(p.listId) - 1];
-                    System.out.printf("Produktname: %s, ", ip.productName);
-                    System.out.printf("Position: %s, Accountnummer: %s\n", p.listId, p.accountNumber); // TODO: save this to a database
+                if (request.accounts[0].listId.equals("0")) {
+                    System.out.printf("Ganze Rechnung: %s", request.accounts[0].accountNumber);
+                } else {
+                    System.out.printf("Rechnungsnumber: %s, ", out.invoice.invoiceNumber);
+                    for (int i = 0; i < request.accounts.length; i++) {
+                        AccountedPosition p = request.accounts[i];
+                        Position ip = out.invoice.positions[Integer.valueOf(p.listId) - 1];
+                        System.out.printf("Produktname: %s, ", ip.productName);
+                        System.out.printf("Position: %s, Accountnummer: %s\n", p.listId, p.accountNumber); // TODO: save this to a database
+                    }
                 }
             }
         }

@@ -56,8 +56,9 @@ function Application(){
                 }
                 return;
             }
+            let t: AccountedPosition = {listId: "0", accountNumber: account?.toString()}
             f(JSON.stringify({
-                fullInvoice: account?.toString()
+                accounts: Array(t)
             }))
         } else {
             const body : AccountedPosition[] = [];
