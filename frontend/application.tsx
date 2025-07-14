@@ -150,12 +150,16 @@ function Application(){
 
     function inputintofilteraccounts(event) { setSearchTerm(event.target.value); }
 
-	return (
+	return ( //TODO: Personenkonto doesn't rerender when using the next and prev buttons
 		<div className="grid grid-cols-[max-content_1fr] min-h-screen">
             <PDFDisplay invoice={data?.invoice} pdfnumber={data?.currentOfPDFS}/>
 			<div className="h-full p-4">
                 <div>
+                    <div className="flex flex-row gap-4">
+                    <button onClick={()=>{ fetch("/back"); setRender(render+1) }}>Zurück</button>
                     <p>PDF: {data?.currentOfPDFS} / {data?.numberOfPDFS}</p>
+                    <button onClick={()=>{ fetch("/skip"); setRender(render+1) }}>Überspringen</button>
+                    </div>
                     <br/>
                     {data?.invoice ? "" : <p>Keine Zugferd Daten enthalten</p>}
                     <Personenkonto sender={data?.invoice?.sender.name}/>

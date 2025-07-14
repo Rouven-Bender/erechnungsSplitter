@@ -43,6 +43,18 @@ class RestAPI {
         refreshPDFSGlobal();
     }
 
+    @GetMapping("/back")
+    void back(){
+        if (selected > 0) {
+            selected--;
+        }
+    }
+
+    @GetMapping("/skip")
+    void skip(){
+        selected++;
+    }
+
     @GetMapping("/ui/personenkonto") 
     ResponseEntity<personenkonto> getPersonenkonto(){
         if (out != null ) {
