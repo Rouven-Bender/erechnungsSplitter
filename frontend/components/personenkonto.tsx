@@ -11,7 +11,7 @@ export default function Personenkonto({sender} : {sender : string | undefined}) 
 
     useEffect(() => {
         try {
-            fetch("/ui/personenkonto/"+id?.toString()).then(rsp => {return rsp.json()}).then(json => {setPersonenkonto(json)})
+            fetch("/api/ui/personenkonto/"+id?.toString()).then(rsp => {return rsp.json()}).then(json => {setPersonenkonto(json)})
         } catch (err) {
             console.log(err.message)
         }
@@ -29,7 +29,7 @@ export default function Personenkonto({sender} : {sender : string | undefined}) 
         }
 
         async function f(body, k) {
-            await fetch("/add/personenkonto", {
+            await fetch("/api/add/personenkonto", {
                 method: "POST",
                 body: body,
                 headers: {

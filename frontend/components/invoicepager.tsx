@@ -8,7 +8,7 @@ export function InvoicePager() {
 
     useEffect (() => {
         try {
-            fetch("/ui/numberofPDFs").then(response => {return response.text()}).then(text => {setNumberofPDFs(parseInt(text))})
+            fetch("/api/ui/numberofPDFs").then(response => {return response.text()}).then(text => {setNumberofPDFs(parseInt(text))})
         } catch (err){
             console.log(err.message)
         }
@@ -17,9 +17,9 @@ export function InvoicePager() {
     if (id != undefined) {
         return (
             <div className="flex flex-row gap-4">
-                {parseInt(id)-1 < 0 ? "" : <Link to={"/"+ (parseInt(id)-1).toString()}>Zurück</Link>}
+                {parseInt(id)-1 < 0 ? "" : <Link to={"/element/"+ (parseInt(id)-1).toString()}>Zurück</Link>}
                 <p>PDF: {parseInt(id)+1} / {numberOfPDFS}</p>
-                {parseInt(id)+1 == numberOfPDFS ? "": <Link to={"/"+ (parseInt(id)+1).toString()}>Überspringen</Link>}
+                {parseInt(id)+1 == numberOfPDFS ? "": <Link to={"/element/"+ (parseInt(id)+1).toString()}>Überspringen</Link>}
             </div>
         )
     }

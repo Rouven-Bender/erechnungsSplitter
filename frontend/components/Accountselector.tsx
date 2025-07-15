@@ -7,7 +7,7 @@ export function Accountselector({className, position, searchterm} : {className? 
     useEffect(() => {
         async function f() {
            try {
-                var response = await fetch("/ui/accounts")
+                var response = await fetch("/api/ui/accounts")
                 setAccounts(await response.json());
            } catch (err) {
                 console.log(err.message)

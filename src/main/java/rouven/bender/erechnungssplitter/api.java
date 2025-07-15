@@ -2,6 +2,8 @@ package rouven.bender.erechnungssplitter;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -43,8 +45,23 @@ class RestAPI {
         refreshPDFSGlobal();
     }
 
+    @GetMapping(path= "/element/{id}", produces = "text/html")
+    byte[] index(@PathVariable("id") String id) {
+        try { 
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            InputStream is = cl.getResourceAsStream("static/index.html");
+            if (is == null) {
+                throw new IOException("input stream couldn' find file");
+            }
+            return is.readAllBytes();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return new byte[]{};
+        }
+    }
+
     // returns empty json for invoices that don't exist
-    @GetMapping("/ui/invoicedata/{id}")
+    @GetMapping("/api/ui/invoicedata/{id}")
     InvoiceData getInvoicedata(@PathVariable("id") int id) {
         if (id < invoiceDatas.size() && id >= 0){
             return Optional.ofNullable(invoiceDatas.get(id)).orElse(new InvoiceData());
@@ -52,7 +69,7 @@ class RestAPI {
         return new InvoiceData();
     }
 
-    @GetMapping("/ui/personenkonto/{id}") 
+    @GetMapping("/api/ui/personenkonto/{id}") 
     personenkonto getPersonenkonto(@PathVariable("id") int id){
         if (id < invoiceDatas.size()){
             InvoiceData iv = invoiceDatas.get(id);
@@ -64,18 +81,17 @@ class RestAPI {
         return new personenkonto("");
     }
 
-    @GetMapping("/ui/accounts")
+    @GetMapping("/api/ui/accounts")
     Account[] getAccounts() {
         return accounts;
     }
 
-    //TODO: turn into json endpoint
-    @GetMapping("/ui/numberofPDFs")
+    @GetMapping("/api/ui/numberofPDFs")
     int getNumberOfPDFS() {
         return pdfs.size();
     }
 
-    @PostMapping("/add/personenkonto")
+    @PostMapping("/api/add/personenkonto")
     ResponseEntity<?> addPersonenkonto(@RequestBody Account toAdd) {
         if (toAdd.name == "" 
             || toAdd.accountNumber == ""
@@ -93,12 +109,12 @@ class RestAPI {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/reset")
+    @GetMapping("/api/filetree/reset")
     void reset(){
         path = new File(basepath);
     }
 
-    @PostMapping("/book/{id}")
+    @PostMapping("/api/book/{id}")
     void book(@RequestBody BookingRequest request, @PathVariable("id") int id) {
         if (request.accounts == null)
         {
@@ -126,12 +142,12 @@ class RestAPI {
         }
     }
     
-    @GetMapping("/pwd")
+    @GetMapping("/api/filetree/pwd")
     String pwd(){
         return path.toString();
     }
 
-    @GetMapping("/ls")
+    @GetMapping("/api/filetree/ls")
     String[] ls(){
         File[] fs = path.listFiles(File::isDirectory);
         if (fs == null) {
@@ -145,7 +161,7 @@ class RestAPI {
         return p;
     }
 
-    @PostMapping("/open") //Opening a folder
+    @PostMapping("/api/filetree/open") //Opening a folder
     void open(@RequestBody String directoryname){
         Path p = Paths.get(path.toString(), directoryname).normalize();
         path = new File(p.toUri());

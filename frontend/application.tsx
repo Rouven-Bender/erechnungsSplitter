@@ -16,8 +16,8 @@ function Application(){
 }
 
 const router = createBrowserRouter([
-    {path: "/:id", element: <Application/>},
-    {path: "/", element: <Navigate to={"/0"}/>}
+    {path: "/element/:id", element: <Application/>},
+    {path: "/", element: <Navigate to={"/element/0"}/>}
 ]);
 
 createRoot(document.getElementById('app')).render(

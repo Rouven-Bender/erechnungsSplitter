@@ -7,9 +7,9 @@ export default function FileTree() {
     useEffect(() => {
         async function f() {
             try {
-                var response = await fetch('/pwd')
+                var response = await fetch('/api/filetree/pwd')
                 setPath(await response.text())
-                response = await fetch('/ls')
+                response = await fetch('/api/filetree/ls')
                 setDirs(await response.json())
             } catch(err){
                 console.log(err.message);
@@ -20,7 +20,7 @@ export default function FileTree() {
 
     function openfolder(event) {
         async function f() {
-            await fetch("/open", {
+            await fetch("/api/filetree/open", {
                 method: "POST",
                 body: event.target.innerText
             })
@@ -30,7 +30,7 @@ export default function FileTree() {
     }
     function resetFolder(){
         async function f(){
-            await fetch("/reset")
+            await fetch("/api/filetree/reset")
             setRender(render+1);
         }
         f();
