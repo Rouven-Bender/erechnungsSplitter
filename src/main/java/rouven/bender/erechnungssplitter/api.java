@@ -59,7 +59,7 @@ class RestAPI {
             if (iv == null) {
                 return new personenkonto("");
             }
-            return new personenkonto(Personenkontos.get(iv.sender.name));
+            return new personenkonto(Optional.ofNullable(Personenkontos.get(iv.sender.name)).orElse(""));
         }
         return new personenkonto("");
     }

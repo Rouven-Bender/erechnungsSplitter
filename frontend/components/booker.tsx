@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Personenkonto from "./personenkonto.tsx";
 import { InvoicePager } from "./invoicepager.tsx";
 import { InvoiceData } from "../types.tsx";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Accountselector } from "./Accountselector";
 import { AccountedPosition } from "../types";
 
@@ -77,8 +77,7 @@ export function Booker() {
         setBookFullInvoice(!bookFullInvoice)
     }
 
-
-    if (bookFullInvoice || invoice == undefined) {
+    if (bookFullInvoice || invoice == undefined || invoice.datum == null) {
         var booker = ( 
             <div>
                 <p>Konto für Rechnung: <br/></p>

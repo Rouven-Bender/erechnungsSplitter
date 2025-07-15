@@ -5,14 +5,13 @@ import { useParams } from "react-router-dom";
 
 export default function Personenkonto({sender} : {sender : string | undefined}) {
     const { id } = useParams()
-    let [ data, setData ] = useState<PersonenkontoRsp>()
+    const [ personenkonto, setPersonenkonto ] = useState<PersonenkontoRsp>()
     const [ addForm, setAddForm ] = useState(false)
     const [ errormsg, setErrorMsg ] = useState("")
-    const [ render, setRender] = useState(0);
 
     useEffect(() => {
         try {
-            fetch("/ui/personenkonto/"+id?.toString()).then(rsp => {return rsp.json()}).then(json => {setData(json)})
+            fetch("/ui/personenkonto/"+id?.toString()).then(rsp => {return rsp.json()}).then(json => {setPersonenkonto(json)})
         } catch (err) {
             console.log(err.message)
         }
@@ -37,10 +36,11 @@ export default function Personenkonto({sender} : {sender : string | undefined}) 
                     "Content-Type": "application/json"
                 }
             })
-            if (data != undefined) { // it should be defined when we get here
-                data.personenkonto = k;
+            if (personenkonto != undefined) { // it should be defined when we get here
+                let tmp:PersonenkontoRsp = {personenkonto: k};
+                setPersonenkonto(tmp)
+                setAddForm(false)
             }
-            setRender(render+1)
         }
         if (sender != undefined){
             const a : Account = {
@@ -55,7 +55,7 @@ export default function Personenkonto({sender} : {sender : string | undefined}) 
         }
     }
 
-    if (data == undefined || data?.personenkonto || data?.personenkonto?.length == 0) {
+    if (personenkonto == undefined || personenkonto?.personenkonto?.length == 0) {
         if (addForm) {
             return (
                 <form action={addPersonenkonto}>
@@ -64,6 +64,11 @@ export default function Personenkonto({sender} : {sender : string | undefined}) 
                     <button className="pl-3" type="submit">Hinzufügen</button>
                     {errormsg.length != 0 ? <p className="text-red-50">{errormsg}</p>: ""}
                 </form>
+            )
+        }
+        if (sender == undefined || sender.length == 0) {
+            return (
+                <p>Senderdaten nicht erkannt</p>
             )
         }
         return (
@@ -76,17 +81,12 @@ export default function Personenkonto({sender} : {sender : string | undefined}) 
             </div>
         )
     } 
-    if (sender == undefined || sender.length == 0) {
-        return (
-            <p>Senderdaten nicht erkannt</p>
-        )
-    }
-    if (data?.personenkonto == undefined) {
+    if (personenkonto?.personenkonto == undefined) {
         return (
             <p>Personenkontodaten noch nicht angekommen</p>
         )
     }
     return (
-        <p>Personenkonto: {data.personenkonto}</p>
+        <p>Personenkonto: {personenkonto.personenkonto}</p>
     )
 }

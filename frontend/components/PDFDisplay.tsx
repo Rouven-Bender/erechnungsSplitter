@@ -43,12 +43,12 @@ export function PDFDisplay(){
     }
 
     pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
-    if (pdfview || invoice == undefined) {
+    if (pdfview || invoice == undefined || invoice.datum == null) {
         return (
             <div className="h-full pt-1.5 pb-1.5 pl-4 pr-4">
                 <div className="mx-auto flex flex-col">
                     <div className="mx-auto">
-                    {invoice == undefined ? <br /> : <label>
+                    {invoice == undefined || invoice.datum == null ? <br /> : <label>
                         <input type="checkbox" name="PDFViewToggle" checked={pdfview} onChange={togglePDFView}></input> PDF Ansicht
                     </label>}
                     </div>
