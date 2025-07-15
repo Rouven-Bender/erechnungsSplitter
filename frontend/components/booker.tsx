@@ -122,16 +122,17 @@ export function Booker() {
                 <InvoicePager />
                 <br/>
                 {invoice ? "" : <p>Keine Zugferd Daten enthalten</p>}
-                <Personenkonto sender={invoice?.sender?.name}/>
-                <br />
-                {invoice == undefined ? <br /> : <div><label><input name="fullBookingToogle"
-                    type="checkbox" checked={bookFullInvoice} onChange={toggleBookFullInvoice}></input> Volle Rechnung auf Konto</label><br /></div>}
-                <input type="text" name="Kontofilter" placeholder="Filter" onChange={inputintofilteraccounts}/>
-                <form action={book}>
-                    {booker}
-                    <button type="submit">Buchen</button>
-                </form>
-                {errormsg ? <p className="pt-15">{errormsg}</p> : ""}
+                <div className="bg-white inline-block">
+                    <Personenkonto sender={invoice?.sender?.name}/>
+                    {invoice == undefined ? <br /> : <div><label><input name="fullBookingToogle"
+                        type="checkbox" checked={bookFullInvoice} onChange={toggleBookFullInvoice}></input> Volle Rechnung auf Konto</label><br /></div>}
+                    <div className="pt-3"><input className="border-1" type="text" name="Kontofilter" placeholder="Filter" onChange={inputintofilteraccounts}/></div>
+                    <form className="pt-3" action={book}>
+                        {booker}
+                        <button className="pt-4" type="submit">Buchen</button>
+                    </form>
+                    {errormsg ? <p className="pt-15">{errormsg}</p> : ""}
+                </div>
             </div>
         </div>
     )

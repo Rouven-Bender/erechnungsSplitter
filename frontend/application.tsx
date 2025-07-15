@@ -8,7 +8,7 @@ import { Booker } from "./components/booker";
 
 function Application(){
 	return (
-		<div className="grid grid-cols-[max-content_1fr] min-h-screen">
+		<div className="grid grid-cols-[max-content_1fr] divide-x-2 divide-dotted min-h-screen bg-green-500/40">
             <PDFDisplay/>
             <Booker/>
 		</div>

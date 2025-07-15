@@ -87,6 +87,6 @@ export default function Personenkonto({sender} : {sender : string | undefined}) 
         )
     }
     return (
-        <p>Personenkonto: {personenkonto.personenkonto}</p>
+        <p>{sender} | Personenkonto: {personenkonto.personenkonto}</p>
     )
 }
