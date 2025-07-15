@@ -21,7 +21,7 @@ export function Accountselector({className, position, searchterm} : {className? 
         <select name={position} className="border border-1">
             <option key={-1} value={""}>Bitte Auswählen</option>
             {accounts?.map((row : Account, idx : number) => {
-                if (row.name.toLowerCase().includes(searchterm) || row.accountNumber.toLowerCase().includes(searchterm)){
+                if (row.name.toLowerCase().includes(searchterm.toLowerCase()) || row.accountNumber.toLowerCase().includes(searchterm.toLowerCase())){
                     return (
                         <option key={idx} value={row.accountNumber}>{row.accountNumber} : {row.name}</option>
                     ) 
