@@ -70,15 +70,15 @@ class RestAPI {
     }
 
     @GetMapping("/api/ui/personenkonto/{id}") 
-    personenkonto getPersonenkonto(@PathVariable("id") int id){
+    ResponseEntity<personenkonto> getPersonenkonto(@PathVariable("id") int id){
         if (id < invoiceDatas.size()){
             InvoiceData iv = invoiceDatas.get(id);
             if (iv == null) {
-                return new personenkonto("");
+                return ResponseEntity.noContent().build();
             }
-            return new personenkonto(Optional.ofNullable(Personenkontos.get(iv.sender.name)).orElse(""));
+            return ResponseEntity.ok().body(new personenkonto(Optional.ofNullable(Personenkontos.get(iv.sender.name)).orElse("")));
         }
-        return new personenkonto("");
+        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/api/ui/accounts")
@@ -186,7 +186,7 @@ class RestAPI {
     // ID is 1 indexed so the frontend can use currentPDF as the pdf id
     @GetMapping(path = "/pdf/{id}", produces = "application/pdf")
     ResponseEntity<byte[]> pdf(@PathVariable("id") int id) {
-        if (id < 0 || id > pdfs.size()) {
+        if (id < 0 || id >= pdfs.size()) {
             return ResponseEntity.badRequest().body(new byte[]{});
         }
         File filename = pdfs.get(id);

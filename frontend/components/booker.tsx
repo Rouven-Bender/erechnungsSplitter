@@ -12,13 +12,15 @@ export function Booker() {
     const [ bookFullInvoice, setBookFullInvoice ] = useState(true);
     const [ invoice, setInvoiceData ] = useState<InvoiceData>()
     const [ errormsg, setErrorMsg ] = useState("")
-    const [searchterm, setSearchTerm] = useState("");
+    const [ searchterm, setSearchTerm ] = useState("");
+    const [ numberOfPDFS, setNumberofPDFs ] = useState(0);
 
     const navigate = useNavigate();
 
     useEffect(() => {
         try {
             fetch("/api/ui/invoicedata/" + id).then(rsp => {return rsp.json()}).then(json => {setInvoiceData(json)})
+            fetch("/api/ui/numberofPDFs").then(response => {return response.text()}).then(text => {setNumberofPDFs(parseInt(text))})
         } catch (err) {
             console.log(err.message)
         }
@@ -30,14 +32,16 @@ export function Booker() {
                 console.log("The PDF ID is undefined")
                 return;
             }
-            await fetch("/api/book/"+id.toString(), {
+            await fetch("/api/book/"+id, {
                 method: "POST",
                 body: body,
                 headers: {
                     "Content-Type": "application/json"
                 }
             })
-            navigate("/element/"+parseInt(id)+1);
+            if ((parseInt(id) + 1) < numberOfPDFS) {
+                navigate("/element/"+(parseInt(id)+1));
+            }
         }
         if (bookFullInvoice) {
             let account = formdata.get("fullInvoice")
