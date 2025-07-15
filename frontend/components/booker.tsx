@@ -121,7 +121,6 @@ export function Booker() {
             <div>
                 <InvoicePager />
                 <br/>
-                {invoice ? "" : <p>Keine Zugferd Daten enthalten</p>}
                 <div className="bg-white inline-block">
                     <Personenkonto sender={invoice?.sender?.name}/>
                     {invoice == undefined ? <br /> : <div><label><input name="fullBookingToogle"
