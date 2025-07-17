@@ -1,15 +1,9 @@
 package rouven.bender.erechnungssplitter;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
+import java.nio.file.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -60,6 +54,18 @@ class RestAPI {
         }
     }
 
+    @GetMapping("/api/ui/accounteddata/{id}")
+    AccountedPosition[] getAccountedData(@PathVariable("id") int id) {
+        if (id < invoiceDatas.size() && id >= 0) {
+            InvoiceData ivd = invoiceDatas.get(id);
+            if (ivd != null) {
+                String personenkonto = Optional.ofNullable(Personenkontos.get(ivd.sender.name)).orElse("");
+                return db.getBookedData(ivd.invoiceNumber, personenkonto).orElse(new AccountedPosition[0]);
+            }
+        }
+        return new AccountedPosition[0];
+    }
+
     // returns empty json for invoices that don't exist
     @GetMapping("/api/ui/invoicedata/{id}")
     InvoiceData getInvoicedata(@PathVariable("id") int id) {
@@ -96,7 +102,7 @@ class RestAPI {
         if (toAdd.name == "" 
             || toAdd.accountNumber == ""
             || !toAdd.accountNumber.matches("[0-9]*")
-         ) {
+        ) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         try {
@@ -115,7 +121,7 @@ class RestAPI {
     }
 
     @PostMapping("/api/book/{id}")
-    void book(@RequestBody BookingRequest request, @PathVariable("id") int id) {
+    void book(@RequestBody BookingRequest request, @PathVariable("id") int id) { //TODO get error to client
         if (request.accounts == null)
         {
             System.out.println("empty request");
@@ -129,14 +135,39 @@ class RestAPI {
 
         if (request.accounts != null) {
             if (request.accounts[0].listId.equals("0")) {
-                System.out.printf("Ganze Rechnung: %s", request.accounts[0].accountNumber);
+                InvoiceData ivd = invoiceDatas.get(id);
+                AccountingRow accRow = new AccountingRow();
+                accRow.betrag = ivd.invoiceTotal;
+                accRow.datum = ivd.datum;
+                accRow.rechnungsnummer = ivd.invoiceNumber;
+                accRow.text = ivd.sender.name;
+                accRow.personenkonto = Optional.ofNullable(Personenkontos.get(ivd.sender.name)).orElse(""); //TODO: add check for personenkonto
+                accRow.aufwandskonto = request.accounts[0].accountNumber;
+                try {
+                    db.bookAccountingRow(accRow); // TODO: check return bool and send result to client
+                } catch (SQLException e){
+                    System.out.println(e.getMessage());
+                    return;
+                }
             } else {
-                System.out.printf("Rechnungsnumber: %s, ", invoiceDatas.get(id).invoiceNumber);
                 for (int i = 0; i < request.accounts.length; i++) {
                     AccountedPosition p = request.accounts[i];
+                    InvoiceData ivd = invoiceDatas.get(id);
                     Position ip = invoiceDatas.get(id).positions[Integer.valueOf(p.listId) - 1];
-                    System.out.printf("Produktname: %s, ", ip.productName);
-                    System.out.printf("Position: %s, Accountnummer: %s\n", p.listId, p.accountNumber); // TODO: save this to a database
+                    AccountingRow accRow = new AccountingRow();
+
+                    accRow.betrag = ip.total;
+                    accRow.datum = ivd.datum;
+                    accRow.rechnungsnummer = ivd.invoiceNumber;
+                    accRow.text = ivd.sender.name + " : " +  p.listId;
+                    accRow.personenkonto = Optional.ofNullable(Personenkontos.get(ivd.sender.name)).orElse("");
+                    accRow.aufwandskonto = p.accountNumber;
+                    try {
+                        db.bookAccountingRow(accRow);
+                    } catch (SQLException e) {
+                        System.out.println(e.getMessage());
+                        return;
+                    }
                 }
             }
         }

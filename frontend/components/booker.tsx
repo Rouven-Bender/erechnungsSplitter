@@ -14,6 +14,7 @@ export function Booker() {
     const [ errormsg, setErrorMsg ] = useState("")
     const [ searchterm, setSearchTerm ] = useState("");
     const [ numberOfPDFS, setNumberofPDFs ] = useState(0);
+    const [ accounteddata, setAccounteddata ] = useState<AccountedPosition[]>()
 
     const navigate = useNavigate();
 
@@ -21,6 +22,7 @@ export function Booker() {
         try {
             fetch("/api/ui/invoicedata/" + id).then(rsp => {return rsp.json()}).then(json => {setInvoiceData(json)})
             fetch("/api/ui/numberofPDFs").then(response => {return response.text()}).then(text => {setNumberofPDFs(parseInt(text))})
+            fetch("/api/ui/accounteddata/" + id).then(rsp => {return rsp.json()}).then(json => { setAccounteddata(json) })
         } catch (err) {
             console.log(err.message)
         }
@@ -81,43 +83,55 @@ export function Booker() {
         setBookFullInvoice(!bookFullInvoice)
     }
 
-    if (bookFullInvoice || invoice == undefined || invoice.datum == null) {
-        var booker = ( 
+    var fullinvoicebooker = (
             <div>
                 <p>Konto für Rechnung: <br/></p>
-                <Accountselector searchterm={searchterm} position={"fullInvoice"} className="pr-3"/>
+                <Accountselector searchterm={searchterm} position={"fullInvoice"}
+                    selected={accounteddata != undefined && accounteddata[0] ? accounteddata[0].accountNumber : ""} className="pr-3"/>
             </div>
-        )
+    )
+
+    var splitinvoice = (
+        <div>
+        <p>Konto für Rechnungspositionen: <br/></p>
+        <table className="border-1 border-spacing-x-3 border-seperate">
+            <thead>
+            <tr>
+                <th>Produktname</th>
+                <th>Netto</th>
+                <th>Anzahl</th>
+                <th>Gesamt</th>
+                <th>Konto</th>
+            </tr>
+            </thead>
+            <tbody>
+                { invoice?.positions?.map((row, idx)=> {
+                    return (
+                        <tr key={row.listId}>
+                            <td>{row.productName}</td>
+                            <td>{row.netto}</td>
+                            <td>{row.quantity}</td>
+                            <td>{row.total}</td>
+                            <td><Accountselector searchterm={searchterm} position={row.listId}
+                                selected={accounteddata != undefined && accounteddata[parseInt(row.listId)-1] ? accounteddata[parseInt(row.listId)-1]?.accountNumber : ""}/></td>
+                        </tr>
+                    ) 
+                })}
+            </tbody>
+        </table>
+        </div>
+    )
+
+    var booker
+    if (bookFullInvoice || invoice == undefined || invoice.datum == null) {
+        booker = fullinvoicebooker
     } else {
-        var booker = (
-            <div>
-            <p>Konto für Rechnungspositionen: <br/></p>
-            <table className="border-1 border-spacing-x-3 border-seperate">
-                <thead>
-                <tr>
-                    <th>Produktname</th>
-                    <th>Netto</th>
-                    <th>Anzahl</th>
-                    <th>Gesamt</th>
-                    <th>Konto</th>
-                </tr>
-                </thead>
-                <tbody>
-                    {invoice?.positions?.map((row, idx)=> {
-                        return (
-                            <tr key={row.listId}>
-                                <td>{row.productName}</td>
-                                <td>{row.netto}</td>
-                                <td>{row.quantity}</td>
-                                <td>{row.total}</td>
-                                <td><Accountselector searchterm={searchterm} position={row.listId}/></td>
-                            </tr>
-                        ) 
-                    })}
-                </tbody>
-            </table>
-            </div>
-        )
+        booker = splitinvoice
+    }
+    if (accounteddata != undefined && accounteddata[0].listId == "0") {
+        booker = fullinvoicebooker 
+    } else {
+        booker = splitinvoice
     }
 
     return (

@@ -29,6 +29,33 @@ public class database {
         return instance;
     }
 
+    public Optional<AccountedPosition[]> getBookedData(String rechnungsnummer, String personenkonto){
+        ArrayList<AccountedPosition> rows = new ArrayList<>();
+        try (PreparedStatement stmt = con.prepareStatement(
+            "select * from bookings where personenkonto=? and rechnungsnummer=?"
+        )) {
+            stmt.setString(1, personenkonto);
+            stmt.setString(2, rechnungsnummer);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                AccountedPosition row = new AccountedPosition();
+                String text = rs.getString("werundwas");
+                String[] shard = text.split(" : ");
+                if (shard.length == 2) {
+                    row.listId = shard[1];
+                } else {
+                    row.listId = "0";
+                }
+                row.accountNumber = rs.getString("aufwandskonto");
+                rows.add(row);
+            }
+            return Optional.of(rows.toArray(new AccountedPosition[0]));
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());
+            return Optional.empty();
+        }
+    }
+
     /**
      * 
      * @param row

@@ -16,4 +16,6 @@ create table bookings (
     werundwas varchar(1024),
     personenkonto varchar(10),
     aufwandskonto varchar(10)
-)
+);
+create index idx_bookings_rechnungsnummer on bookings(rechnungsnummer);
+create index idx_bookings_personenkonto on bookings(personenkonto)
