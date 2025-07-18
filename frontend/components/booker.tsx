@@ -45,28 +45,43 @@ export function Booker() {
                 navigate("/element/"+(parseInt(id)+1));
             }
         }
-        if (bookFullInvoice) {
+        var isBooked = (accounteddata != undefined && accounteddata[0] != undefined)
+        var fullInvoiceBooked = (isBooked && accounteddata != undefined && accounteddata[0].listId == "0")
+        var checked
+        if (isBooked) {
+            if (fullInvoiceBooked) {
+                checked = true
+            } else {
+                checked = false
+            }
+        } else {
+            if (bookFullInvoice) {
+                checked = true
+            } else {
+                checked = false
+            }
+        }
+        if (checked) {
             let account = formdata.get("fullInvoice")
-            if (account?.toString() == "" || account == undefined) { 
+            if (account?.toString() == "" || account == undefined) {
                 setErrorMsg("Kein Konto ausgewählt")
                 return;
             }
-            let t: AccountedPosition = {listId: "0", accountNumber: account?.toString()}
+            let t: AccountedPosition = { listId: "0", accountNumber: account?.toString() }
             f(JSON.stringify({
                 accounts: Array(t)
             }))
         } else {
-            const body : AccountedPosition[] = [];
+            const body: AccountedPosition[] = [];
             const i = formdata.entries();
-            for (var row : IteratorResult<[string, FormDataEntryValue], any> = i.next();
-                row.value != undefined; row = i.next())
-                {
+            for (var row: IteratorResult<[string, FormDataEntryValue], any> = i.next();
+                row.value != undefined; row = i.next()) {
                 if (row.value[1] == "") {
                     setErrorMsg("Nicht alle Positionen haben ein Konto")
                     return
                 }
-                const e : AccountedPosition = {
-                    listId:  row.value[0],
+                const e: AccountedPosition = {
+                    listId: row.value[0],
                     accountNumber: row.value[1]
                 }
                 body.push(e)
@@ -87,7 +102,7 @@ export function Booker() {
             <div>
                 <p>Konto für Rechnung: <br/></p>
                 <Accountselector searchterm={searchterm} position={"fullInvoice"}
-                    selected={accounteddata != undefined && accounteddata[0] ? accounteddata[0].accountNumber : ""} className="pr-3"/>
+                    selected={accounteddata != undefined && accounteddata[0] ? accounteddata[0].accountNumber : undefined} className="pr-3"/>
             </div>
     )
 
@@ -113,7 +128,7 @@ export function Booker() {
                             <td>{row.quantity}</td>
                             <td>{row.total}</td>
                             <td><Accountselector searchterm={searchterm} position={row.listId}
-                                selected={accounteddata != undefined && accounteddata[parseInt(row.listId)-1] ? accounteddata[parseInt(row.listId)-1]?.accountNumber : ""}/></td>
+                                selected={accounteddata != undefined && accounteddata[parseInt(row.listId)-1] ? accounteddata[parseInt(row.listId)-1]?.accountNumber : undefined}/></td>
                         </tr>
                     ) 
                 })}
@@ -143,6 +158,21 @@ export function Booker() {
         booker = splitinvoice
     }
 
+    var checked
+    if (isBooked) {
+        if (fullInvoiceBooked) {
+            checked = true
+        } else {
+            checked = false
+        }
+    } else {
+        if (bookFullInvoice) {
+            checked = true
+        } else {
+            checked = false
+        }
+    }
+
     return (
 		<div className="h-full p-4">
             <div>
@@ -151,7 +181,7 @@ export function Booker() {
                 <div className="bg-white inline-block">
                     <Personenkonto sender={invoice?.sender?.name}/>
                     {invoice == undefined ? <br /> : <div><label><input name="fullBookingToogle"
-                        type="checkbox" checked={bookFullInvoice} onChange={toggleBookFullInvoice}></input> Volle Rechnung auf Konto</label><br /></div>}
+                        type="checkbox" checked={checked} onChange={toggleBookFullInvoice}></input> Volle Rechnung auf Konto</label><br /></div>}
                     <div className="pt-3"><input className="border-1" type="text" name="Kontofilter" placeholder="Filter" onChange={inputintofilteraccounts}/></div>
                     <form className="pt-3" action={book}>
                         {booker}

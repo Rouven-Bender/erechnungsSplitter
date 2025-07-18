@@ -1,14 +1,32 @@
 package rouven.bender.erechnungssplitter;
 
-import java.io.*;
-import java.nio.file.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Optional;
 
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import rouven.bender.erechnungssplitter.models.*;
+import rouven.bender.erechnungssplitter.models.Account;
+import rouven.bender.erechnungssplitter.models.AccountedPosition;
+import rouven.bender.erechnungssplitter.models.AccountingRow;
+import rouven.bender.erechnungssplitter.models.BookingRequest;
+import rouven.bender.erechnungssplitter.models.InvoiceData;
+import rouven.bender.erechnungssplitter.models.Position;
+import rouven.bender.erechnungssplitter.models.personenkonto;
 
 @RestController
 class RestAPI {
@@ -120,6 +138,13 @@ class RestAPI {
         path = new File(basepath);
     }
 
+    @GetMapping("/test")
+    boolean test() {
+    //   return db.invoiceBooked("202500891");
+        return false;
+    }
+
+
     @PostMapping("/api/book/{id}")
     void book(@RequestBody BookingRequest request, @PathVariable("id") int id) { //TODO get error to client
         if (request.accounts == null)
@@ -133,15 +158,26 @@ class RestAPI {
             return;
         }
 
+        String pk = Personenkontos.get(invoiceDatas.get(id).sender.name);
+        if (pk == null) {
+            System.out.println("kein Personenkonto für Sender");
+            return;
+        }
+
+        String ivNumber = invoiceDatas.get(id).invoiceNumber;
+        if (db.invoiceBooked(ivNumber, pk)) {
+            db.deleteBookedInvoice(ivNumber, pk);
+        }
+
         if (request.accounts != null) {
             if (request.accounts[0].listId.equals("0")) {
                 InvoiceData ivd = invoiceDatas.get(id);
                 AccountingRow accRow = new AccountingRow();
                 accRow.betrag = ivd.invoiceTotal;
                 accRow.datum = ivd.datum;
-                accRow.rechnungsnummer = ivd.invoiceNumber;
+                accRow.rechnungsnummer = ivNumber;
                 accRow.text = ivd.sender.name;
-                accRow.personenkonto = Optional.ofNullable(Personenkontos.get(ivd.sender.name)).orElse(""); //TODO: add check for personenkonto
+                accRow.personenkonto = pk; 
                 accRow.aufwandskonto = request.accounts[0].accountNumber;
                 try {
                     db.bookAccountingRow(accRow); // TODO: check return bool and send result to client
@@ -158,9 +194,9 @@ class RestAPI {
 
                     accRow.betrag = ip.total;
                     accRow.datum = ivd.datum;
-                    accRow.rechnungsnummer = ivd.invoiceNumber;
+                    accRow.rechnungsnummer = ivNumber;
                     accRow.text = ivd.sender.name + " : " +  p.listId;
-                    accRow.personenkonto = Optional.ofNullable(Personenkontos.get(ivd.sender.name)).orElse("");
+                    accRow.personenkonto = pk;
                     accRow.aufwandskonto = p.accountNumber;
                     try {
                         db.bookAccountingRow(accRow);

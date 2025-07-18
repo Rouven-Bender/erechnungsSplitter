@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { Account } from "../types";
 
 export function Accountselector({className, position, searchterm, selected} : {className? : string | undefined, position : string, searchterm : string, selected?: string}) {
     const [accounts, setAccounts] = useState<Account[]>([])
-
+    const [s, setSelected ] = useState<string>("")
+    
     useEffect(() => {
         async function f() {
            try {
@@ -14,11 +15,18 @@ export function Accountselector({className, position, searchterm, selected} : {c
            }
         }
         f();
-    }, [])
 
-    return (
-        <div className={"inline " + className}>
-        <select name={position} className="border border-1" value={selected}>
+        if (selected != undefined) {
+            setSelected(selected)
+        }
+    }, [selected])
+
+    const handleChange = event => {
+        setSelected(event.target.value)
+    }
+
+    var selector = (
+        <select name={position} className="border border-1" value={s} onChange={handleChange}>
             <option key={-1} value={""}>Bitte Auswählen</option>
             {accounts?.map((row : Account, idx : number) => {
                 if (row.name.toLowerCase().includes(searchterm.toLowerCase()) || row.accountNumber.toLowerCase().includes(searchterm.toLowerCase())){
@@ -29,6 +37,10 @@ export function Accountselector({className, position, searchterm, selected} : {c
                 }
             })}
         </select>
+    )
+    return (
+        <div className={className ? "inline " + className : "inline"}>
+            {selector}
         </div>
     )
 }

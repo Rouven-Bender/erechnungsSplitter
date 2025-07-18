@@ -29,6 +29,35 @@ public class database {
         return instance;
     }
 
+    public boolean invoiceBooked(String invoiceNumber, String personenkonto) {
+        try (PreparedStatement stmt = con.prepareStatement(
+            "select count(*) from bookings where rechnungsnummer=? and personenkonto=?"
+        )){
+            stmt.setString(1, invoiceNumber); 
+            stmt.setString(2, personenkonto);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()){
+                return rs.getInt(1) > 0;
+            }
+            return false;
+        } catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+        return false;
+    }
+
+    public void deleteBookedInvoice(String invoiceNumber, String personenkonto) {
+        try (PreparedStatement stmt = con.prepareStatement(
+            "delete from bookings where rechnungsnummer=? and personenkonto=?"
+        )) {
+            stmt.setString(1, invoiceNumber);
+            stmt.setString(2, personenkonto);
+            stmt.executeUpdate();
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     public Optional<AccountedPosition[]> getBookedData(String rechnungsnummer, String personenkonto){
         ArrayList<AccountedPosition> rows = new ArrayList<>();
         try (PreparedStatement stmt = con.prepareStatement(
