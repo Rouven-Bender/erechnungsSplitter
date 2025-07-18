@@ -7,26 +7,13 @@ import java.util.*;
 import rouven.bender.erechnungssplitter.models.*;
 
 public class database {
-    private static database instance;
-    
     private Connection con;
 
-    private database() throws SQLException, ClassNotFoundException{
+    public database(String mandant) throws SQLException, ClassNotFoundException{
         String path = (String) Config.getInstance().getSetting("basepath"); // TODO: Per Customer DB für einfaches Einspielen von daten und einfachem Löschen
+        path = Paths.get(path, mandant).toString();
         Class.forName("org.sqlite.JDBC");
         con = DriverManager.getConnection("jdbc:sqlite:"+Paths.get(path, "db.sqlite").toString());
-    }
-
-    public static database getInstance(){
-        if (instance == null) {
-            try {
-                instance = new database();
-            } catch(Exception e) {
-                System.out.println(e.getMessage());
-                System.exit(1);
-            }
-        }
-        return instance;
     }
 
     public boolean invoiceBooked(String invoiceNumber, String personenkonto) {

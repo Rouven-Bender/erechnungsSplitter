@@ -5,6 +5,7 @@ import { createBrowserRouter, Navigate, RouterProvider, useParams } from "react-
 //import FileTree from "./components/filetree";
 import { PDFDisplay } from "./components/PDFDisplay";
 import { Booker } from "./components/booker";
+import { Management } from "./components/management";
 
 function Application(){
 	return (
@@ -16,8 +17,10 @@ function Application(){
 }
 
 const router = createBrowserRouter([
+    //{path: "/", element: <Navigate to={"/element/0"}/>},
+    {path: "/", element: <Navigate to={"/management"}/>},
     {path: "/element/:id", element: <Application/>},
-    {path: "/", element: <Navigate to={"/element/0"}/>}
+    {path: "/management", element: <Management/>}
 ]);
 
 createRoot(document.getElementById('app')).render(

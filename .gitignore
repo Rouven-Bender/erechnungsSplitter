@@ -11,4 +11,5 @@ src/main/resources/static/pdf.worker.min.mjs
 accounts.csv
 datev.csv
 personenkonto.csv
-db.sqlite
+
+testfolder/*

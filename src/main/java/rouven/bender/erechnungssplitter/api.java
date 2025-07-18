@@ -38,15 +38,25 @@ class RestAPI {
     private ArrayList<File> pdfs;
     private ArrayList<InvoiceData> invoiceDatas;
 
+    private String mandant = "";
+
     private Account[] accounts;
     private HashMap<String, String> Personenkontos;
 
     RestAPI() {
         cfg = Config.getInstance();
         basepath = cfg.getSetting("basepath").toString();
-        path = new File(basepath);
+    }
 
-        db = database.getInstance();
+    private void init() {
+        path = new File(Paths.get(basepath, mandant).toString());
+
+        try {
+            db = new database(mandant);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.exit(1);
+        }
         accounts = db.getAccounts().orElse(null);
         Personenkontos = db.getPersonenkonten().orElse(null);
         if (accounts == null || Personenkontos == null) {
@@ -56,9 +66,8 @@ class RestAPI {
 
         refreshPDFSGlobal();
     }
-
-    @GetMapping(path= "/element/{id}", produces = "text/html")
-    byte[] index(@PathVariable("id") String id) {
+    
+    private byte[] getindexdothtml() {
         try { 
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             InputStream is = cl.getResourceAsStream("static/index.html");
@@ -72,6 +81,15 @@ class RestAPI {
         }
     }
 
+    @GetMapping(path= "/element/{id}", produces = "text/html")
+    byte[] index(@PathVariable("id") String id) {
+        return getindexdothtml();
+    }
+    @GetMapping(path= "/management", produces = "text/html")
+    byte[] management() {
+        return getindexdothtml();
+    }
+
     @GetMapping("/api/ui/accounteddata/{id}")
     AccountedPosition[] getAccountedData(@PathVariable("id") int id) {
         if (id < invoiceDatas.size() && id >= 0) {
@@ -82,6 +100,23 @@ class RestAPI {
             }
         }
         return new AccountedPosition[0];
+    }
+
+    @GetMapping("/api/ui/mandanten")
+    String[] getMandantenListe() {
+        File[] dirs = new File(basepath).listFiles(File::isDirectory);
+        ArrayList<String> t = new ArrayList<>();
+        for (int i = 0; i<dirs.length; i++) {
+            String[] p = dirs[i].toString().split(File.separator);
+            t.add(p[p.length-1]);
+        }
+        return t.toArray(new String[0]);
+    }
+    
+    @PostMapping("/api/select/mandant")
+    void selectMandant(@RequestBody String m){
+        mandant = m;
+        init();
     }
 
     // returns empty json for invoices that don't exist
@@ -139,9 +174,8 @@ class RestAPI {
     }
 
     @GetMapping("/test")
-    boolean test() {
-    //   return db.invoiceBooked("202500891");
-        return false;
+    String test() {
+        return mandant;
     }
 
 
