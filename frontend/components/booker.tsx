@@ -122,15 +122,24 @@ export function Booker() {
         </div>
     )
 
+    var isBooked = (accounteddata != undefined && accounteddata[0] != undefined)
+    var fullInvoiceBooked = (isBooked && accounteddata != undefined && accounteddata[0].listId == "0")
+    var invoicedataExists = (invoice != undefined && invoice.datum != null)
+
     var booker
-    if (bookFullInvoice || invoice == undefined || invoice.datum == null) {
+    if (isBooked && fullInvoiceBooked) {
         booker = fullinvoicebooker
-    } else {
+    }
+    if (isBooked && !fullInvoiceBooked) {
         booker = splitinvoice
     }
-    if (accounteddata != undefined && accounteddata[0].listId == "0") {
-        booker = fullinvoicebooker 
-    } else {
+    if (!invoicedataExists && !isBooked) {
+        booker = fullinvoicebooker
+    }
+    if (!isBooked && bookFullInvoice) {
+        booker = fullinvoicebooker
+    }
+    if (!isBooked && !bookFullInvoice) {
         booker = splitinvoice
     }
 
