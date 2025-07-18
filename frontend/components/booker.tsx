@@ -10,6 +10,7 @@ import { AccountedPosition } from "../types";
 export function Booker() {
     const { id } = useParams()
     const [ bookFullInvoice, setBookFullInvoice ] = useState(true);
+    const [ editMode, setEditMode ] = useState(false)
     const [ invoice, setInvoiceData ] = useState<InvoiceData>()
     const [ errormsg, setErrorMsg ] = useState("")
     const [ searchterm, setSearchTerm ] = useState("");
@@ -28,6 +29,10 @@ export function Booker() {
         }
     }, [id])
 
+    var isBooked = (accounteddata != undefined && accounteddata[0] != undefined)
+    var fullInvoiceBooked = (isBooked && accounteddata != undefined && accounteddata[0].listId == "0")
+    var invoicedataExists = (invoice != undefined && invoice.datum != null)
+
     function book(formdata : FormData) {
         async function f(body) {
             if (id == undefined) {
@@ -43,12 +48,11 @@ export function Booker() {
             })
             if ((parseInt(id) + 1) < numberOfPDFS) {
                 navigate("/element/"+(parseInt(id)+1));
+                setEditMode(false)
             }
         }
-        var isBooked = (accounteddata != undefined && accounteddata[0] != undefined)
-        var fullInvoiceBooked = (isBooked && accounteddata != undefined && accounteddata[0].listId == "0")
         var checked
-        if (isBooked) {
+        if (isBooked && !editMode) {
             if (fullInvoiceBooked) {
                 checked = true
             } else {
@@ -95,6 +99,9 @@ export function Booker() {
     function inputintofilteraccounts(event) { setSearchTerm(event.target.value); }
 
     function toggleBookFullInvoice() {
+        if (!editMode) {
+            setEditMode(true);
+        }
         setBookFullInvoice(!bookFullInvoice)
     }
 
@@ -102,7 +109,7 @@ export function Booker() {
             <div>
                 <p>Konto für Rechnung: <br/></p>
                 <Accountselector searchterm={searchterm} position={"fullInvoice"}
-                    selected={accounteddata != undefined && accounteddata[0] ? accounteddata[0].accountNumber : undefined} className="pr-3"/>
+                    selected={accounteddata != undefined && accounteddata[0] && !editMode ? accounteddata[0].accountNumber : undefined} className="pr-3"/>
             </div>
     )
 
@@ -128,7 +135,7 @@ export function Booker() {
                             <td>{row.quantity}</td>
                             <td>{row.total}</td>
                             <td><Accountselector searchterm={searchterm} position={row.listId}
-                                selected={accounteddata != undefined && accounteddata[parseInt(row.listId)-1] ? accounteddata[parseInt(row.listId)-1]?.accountNumber : undefined}/></td>
+                                selected={accounteddata != undefined && accounteddata[parseInt(row.listId)-1] && !editMode? accounteddata[parseInt(row.listId)-1]?.accountNumber : undefined}/></td>
                         </tr>
                     ) 
                 })}
@@ -137,29 +144,30 @@ export function Booker() {
         </div>
     )
 
-    var isBooked = (accounteddata != undefined && accounteddata[0] != undefined)
-    var fullInvoiceBooked = (isBooked && accounteddata != undefined && accounteddata[0].listId == "0")
-    var invoicedataExists = (invoice != undefined && invoice.datum != null)
-
     var booker
-    if (isBooked && fullInvoiceBooked) {
+    if (editMode && bookFullInvoice) {
         booker = fullinvoicebooker
-    }
-    if (isBooked && !fullInvoiceBooked) {
+    } else {
         booker = splitinvoice
     }
-    if (!invoicedataExists && !isBooked) {
+    if (isBooked && fullInvoiceBooked && !editMode) {
         booker = fullinvoicebooker
     }
-    if (!isBooked && bookFullInvoice) {
+    if (isBooked && !fullInvoiceBooked && !editMode) {
+        booker = splitinvoice
+    }
+    if (!invoicedataExists && !isBooked && !editMode) {
         booker = fullinvoicebooker
     }
-    if (!isBooked && !bookFullInvoice) {
+    if (!isBooked && bookFullInvoice && !editMode) {
+        booker = fullinvoicebooker
+    }
+    if (!isBooked && !bookFullInvoice && !editMode) {
         booker = splitinvoice
     }
 
     var checked
-    if (isBooked) {
+    if (isBooked && !editMode) {
         if (fullInvoiceBooked) {
             checked = true
         } else {
