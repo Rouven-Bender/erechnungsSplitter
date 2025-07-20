@@ -1,32 +1,14 @@
 package rouven.bender.erechnungssplitter;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
+import java.nio.file.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
-import org.springframework.http.CacheControl;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
 
-import rouven.bender.erechnungssplitter.models.Account;
-import rouven.bender.erechnungssplitter.models.AccountedPosition;
-import rouven.bender.erechnungssplitter.models.AccountingRow;
-import rouven.bender.erechnungssplitter.models.BookingRequest;
-import rouven.bender.erechnungssplitter.models.InvoiceData;
-import rouven.bender.erechnungssplitter.models.Position;
-import rouven.bender.erechnungssplitter.models.personenkonto;
+import rouven.bender.erechnungssplitter.models.*;
 
 @RestController
 class RestAPI {
