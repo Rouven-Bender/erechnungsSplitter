@@ -6,13 +6,19 @@ import { createBrowserRouter, Navigate, RouterProvider, useParams } from "react-
 import { PDFDisplay } from "./components/PDFDisplay";
 import { Booker } from "./components/booker";
 import { Management } from "./components/management";
+import { Link } from "react-router-dom";
 
 function Application(){
 	return (
-		<div className="grid grid-cols-[max-content_1fr] divide-x-2 divide-dotted min-h-screen">
-            <PDFDisplay/>
-            <Booker/>
-		</div>
+        <div className="min-h-screen">
+		    <div className="grid grid-cols-[max-content_1fr] divide-x-2 divide-dotted min-h-[97vh]">
+                <PDFDisplay/>
+                <Booker/>
+		    </div>
+            <div className="min-h-fit border-t-1">
+                <Link className="pl-3 bottom-5 right-5" to={"/management"}>Management</Link>
+            </div>
+        </div>
 	)
 }
 
