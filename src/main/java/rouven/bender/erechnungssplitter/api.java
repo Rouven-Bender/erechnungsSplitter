@@ -287,6 +287,9 @@ class RestAPI {
     // ID is 1 indexed so the frontend can use currentPDF as the pdf id
     @GetMapping(path = "/pdf/{id}", produces = "application/pdf")
     ResponseEntity<byte[]> pdf(@PathVariable("id") int id) {
+        if (pdfs == null) {
+            return ResponseEntity.noContent().build();
+        }
         if (id < 0 || id >= pdfs.size()) {
             return ResponseEntity.badRequest().body(new byte[]{});
         }
