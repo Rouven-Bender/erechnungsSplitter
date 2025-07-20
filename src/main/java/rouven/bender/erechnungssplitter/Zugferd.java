@@ -10,8 +10,7 @@ import org.mustangproject.TradeParty;
 import org.mustangproject.ZUGFeRD.IZUGFeRDExportableItem;
 import org.mustangproject.ZUGFeRD.ZUGFeRDImporter;
 
-import rouven.bender.erechnungssplitter.models.InvoiceData;
-import rouven.bender.erechnungssplitter.models.Position;
+import rouven.bender.erechnungssplitter.models.*;
 
 public class Zugferd {
     private static final DecimalFormat df = new DecimalFormat("#,##0.00#");
