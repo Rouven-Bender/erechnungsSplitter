@@ -21,6 +21,7 @@ class RestAPI {
     private ArrayList<InvoiceData> invoiceDatas;
 
     private String mandant = "";
+    private String year = "";
 
     private Account[] accounts;
     private HashMap<String, String> Personenkontos;
@@ -31,10 +32,10 @@ class RestAPI {
     }
 
     private void init() {
-        path = new File(Paths.get(basepath, mandant).toString());
+        path = new File(Paths.get(basepath, mandant, year).toString());
 
         try {
-            db = new database(mandant);
+            db = new database(mandant, year);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             System.exit(1);
@@ -86,21 +87,11 @@ class RestAPI {
         }
         return new AccountedPosition[0];
     }
-
-    @GetMapping("/api/ui/mandanten")
-    String[] getMandantenListe() {
-        File[] dirs = new File(basepath).listFiles(File::isDirectory);
-        ArrayList<String> t = new ArrayList<>();
-        for (int i = 0; i<dirs.length; i++) {
-            String[] p = dirs[i].toString().split(File.separator);
-            t.add(p[p.length-1]);
-        }
-        return t.toArray(new String[0]);
-    }
     
     @PostMapping("/api/select/mandant")
-    void selectMandant(@RequestBody String m){
-        mandant = m;
+    void selectMandant(@RequestBody MandantenSelector m){
+        mandant = m.mandant;
+        year = m.year;
         init();
     }
 

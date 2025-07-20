@@ -1,17 +1,10 @@
-import React, {useState, useEffect, ChangeEvent} from "react";
-import { useNavigate } from "react-router-dom";
+import React, {useState, useEffect} from "react";
 
-import { MandantenSelector } from "./mandantenselector";
-
-export function Management(){
+export function MandantenSelector({purpose, endpoint}: {purpose: string, endpoint: string}){
     const [ mandanten, setMandanten ] = useState<string[]>()
     const [ years, setYears ] = useState<string[]>()
     const [ selectedM, selectMandant ] = useState("");
     const [ selectedY, selectYear ] = useState("");
-    const [ exportMode, setExportMode ] = useState(false)
-    const [ initDBMode, setInitDBMode ] = useState(false)
-
-    const navigate = useNavigate();
 
     useEffect(() => {
         try {
@@ -24,24 +17,25 @@ export function Management(){
         }
     }, [selectedM])
 
-    async function mandant(event) {
+    function mandant(event) {
         var v = event.target.innerText
         if (v.length == 0) {
             return;
         }
         selectMandant(v)
     }
-    async function year(event) {
+
+    function year(event) {
         var v = event.target.innerText
         if (v.length == 0) {
             return;
         }
         selectYear(v)
     }
-
-    async function select(){
+    
+    async function select() {
         if (selectedM != "" && selectedY != "") {
-            await fetch("/api/select/mandant", {
+            fetch(endpoint, {
                 method: "POST",
                 body: JSON.stringify({
                     mandant: selectedM,
@@ -51,10 +45,8 @@ export function Management(){
                     "Content-Type": "application/json"
                 }
             })
-            navigate("/element/0")
         }
     }
-
     function unset_latest(){
         if (selectedY != "") {
             selectYear("")
@@ -66,20 +58,12 @@ export function Management(){
         }
     }
 
-    var selectorbox;
-    if (exportMode) {
-        selectorbox = <MandantenSelector purpose="Exportieren" endpoint="/api/management/export"/>
-    }
-    if (initDBMode) {
-        selectorbox = <MandantenSelector purpose="Initialisieren" endpoint="/api/management/initdb"/>
-    }
-
-    var inner
+    var inner;
     if (selectedM == "") {
         inner = (
             <div>
-                <p>Mandanten:</p>
-                <ul className="list-disc pl-5">
+                <p>Wähle Mantant</p>
+                <ul className="pl-3 list-disc">
                 {mandanten?.map((m, idx) => {
                     return (
                         <li key={idx}><a onClick={mandant}>{m}</a></li>
@@ -92,8 +76,8 @@ export function Management(){
     if (selectedM != "" && selectedY == "") {
         inner = (
             <div>
-                <p>Jahr:</p>
-                <ul className="list-disc pl-5">
+                <p>Wähle Jahr</p>
+                <ul className="pl-3 list-disc">
                 {years?.map((m, idx) => {
                     return (
                         <li key={idx}><a onClick={year}>{m}</a></li>
@@ -105,22 +89,12 @@ export function Management(){
     }
 
     return (
-        <div className="p-4 flex flex-row gap-4">
-            <div>
-                {inner}
-                <div className="flex gap-3">
-                    <button onClick={unset_latest}>Zurück</button>
-                    <button onClick={select}>Öffnen</button>
-                </div>
+        <div className="border-1"><div className="p-2">
+            {inner}
+            <div className="flex gap-3">
+                <button onClick={unset_latest}>Zurück</button>
+                <button onClick={select}>{purpose}</button>
             </div>
-            <div>
-                <p>Aktionen:</p>
-                <ul className="list-disc pl-5">
-                    <li><a onClick={() => {setInitDBMode(false); setExportMode(true)}}>Export</a></li>
-                    <li><a onClick={() => {setInitDBMode(true); setExportMode(false)}}>Initializiere Datenbank</a></li>
-                </ul>
-                {selectorbox}
-            </div>
-        </div>
-    ) 
+        </div></div>
+    )
 }
