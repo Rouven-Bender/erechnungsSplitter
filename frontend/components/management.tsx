@@ -31,7 +31,7 @@ export function Management(){
                 <ul className="list-disc pl-5">
                 {mandanten?.map((m, idx) => {
                     return (
-                        <li key={idx} onClick={selectMandant}>{m}</li>
+                        <li key={idx}><a onClick={selectMandant}>{m}</a></li>
                     )
                 })}
                 </ul>
