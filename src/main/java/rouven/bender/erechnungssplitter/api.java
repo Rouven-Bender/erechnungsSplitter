@@ -90,8 +90,11 @@ class RestAPI {
         return getindexdothtml();
     }
 
-    @GetMapping("/api/ui/accounteddata/{id}")
+    @GetMapping("/api/ui/{id}/accounteddata")
     AccountedPosition[] getAccountedData(@PathVariable("id") int id) {
+        if (invoiceDatas == null) {
+            return new AccountedPosition[0];
+        }
         if (id < invoiceDatas.size() && id >= 0) {
             InvoiceData ivd = invoiceDatas.get(id);
             if (ivd != null) {
@@ -120,16 +123,22 @@ class RestAPI {
     }
 
     // returns empty json for invoices that don't exist
-    @GetMapping("/api/ui/invoicedata/{id}")
-    InvoiceData getInvoicedata(@PathVariable("id") int id) {
-        if (id < invoiceDatas.size() && id >= 0){
-            return Optional.ofNullable(invoiceDatas.get(id)).orElse(new InvoiceData());
+    @GetMapping("/api/ui/{id}/invoicedata")
+    ResponseEntity<InvoiceData> getInvoicedata(@PathVariable("id") int id) {
+        if (invoiceDatas == null) {
+            return ResponseEntity.noContent().build();
         }
-        return new InvoiceData();
+        if (id < invoiceDatas.size() && id >= 0){
+            return ResponseEntity.ok().body(Optional.ofNullable(invoiceDatas.get(id)).orElse(new InvoiceData()));
+        }
+        return ResponseEntity.ok().body(new InvoiceData());
     }
 
-    @GetMapping("/api/ui/personenkonto/{id}") 
+    @GetMapping("/api/ui/{id}/personenkonto") 
     ResponseEntity<personenkonto> getPersonenkonto(@PathVariable("id") int id){
+        if (invoiceDatas == null) {
+            return ResponseEntity.noContent().build();
+        }
         if (id < invoiceDatas.size()){
             InvoiceData iv = invoiceDatas.get(id);
             if (iv == null) {
@@ -147,6 +156,9 @@ class RestAPI {
 
     @GetMapping("/api/ui/numberofPDFs")
     int getNumberOfPDFS() {
+        if (pdfs == null) {
+            return -1;
+        }
         return pdfs.size();
     }
 
@@ -179,7 +191,7 @@ class RestAPI {
     }
 
 
-    @PostMapping("/api/book/{id}")
+    @PostMapping("/api/{id}/book")
     void book(@RequestBody BookingRequest request, @PathVariable("id") int id) { //TODO get error to client
         if (request.accounts == null)
         {

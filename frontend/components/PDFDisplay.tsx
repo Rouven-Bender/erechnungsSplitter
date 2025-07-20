@@ -20,7 +20,7 @@ export function PDFDisplay(){
     useEffect(() => {
         try {
             fetch("/api/ui/numberofPDFs").then(response => {return response.text()}).then(text => {setNumberofPDFs(parseInt(text))})
-            fetch("/api/ui/invoicedata/" + id).then(Response => {return Response.json()}).then(json => {setInvoiceData(json)})
+            fetch("/api/ui/"+id+"/invoicedata").then(Response => {return Response.json()}).then(json => {setInvoiceData(json)})
         } catch (err) {
             console.log(err.message)
         }

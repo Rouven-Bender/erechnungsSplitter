@@ -11,7 +11,7 @@ export default function Personenkonto({sender} : {sender : string | undefined}) 
 
     useEffect(() => {
         try {
-            fetch("/api/ui/personenkonto/"+id?.toString()).then(rsp => {return rsp.json()}).then(json => {setPersonenkonto(json)})
+            fetch("/api/ui/"+id?.toString()+"/personenkonto").then(rsp => {return rsp.json()}).then(json => {setPersonenkonto(json)})
         } catch (err) {
             console.log(err.message)
         }

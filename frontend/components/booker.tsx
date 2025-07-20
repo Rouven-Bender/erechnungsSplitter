@@ -21,9 +21,9 @@ export function Booker() {
 
     useEffect(() => {
         try {
-            fetch("/api/ui/invoicedata/" + id).then(rsp => {return rsp.json()}).then(json => {setInvoiceData(json)})
+            fetch("/api/ui/" + id + "/invoicedata").then(rsp => {return rsp.json()}).then(json => {setInvoiceData(json)})
             fetch("/api/ui/numberofPDFs").then(response => {return response.text()}).then(text => {setNumberofPDFs(parseInt(text))})
-            fetch("/api/ui/accounteddata/" + id).then(rsp => {return rsp.json()}).then(json => { setAccounteddata(json) })
+            fetch("/api/ui/" + id +"/accounteddata").then(rsp => {return rsp.json()}).then(json => { setAccounteddata(json) })
         } catch (err) {
             console.log(err.message)
         }
@@ -39,7 +39,7 @@ export function Booker() {
                 console.log("The PDF ID is undefined")
                 return;
             }
-            await fetch("/api/book/"+id, {
+            await fetch("/api/"+id+"/book", {
                 method: "POST",
                 body: body,
                 headers: {
