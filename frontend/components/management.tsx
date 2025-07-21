@@ -68,7 +68,7 @@ export function Management(){
 
     var selectorbox;
     if (exportMode) {
-        selectorbox = <MandantenSelector purpose="Exportieren" endpoint="/api/management/export"/>
+        selectorbox = <MandantenSelector purpose="Exportieren" endpoint="/api/management/export" download={true}/>
     }
     if (initDBMode) {
         selectorbox = <MandantenSelector purpose="Initialisieren" endpoint="/api/management/initdb"/>

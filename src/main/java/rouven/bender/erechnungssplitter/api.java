@@ -35,7 +35,7 @@ class RestAPI {
         path = new File(Paths.get(basepath, mandant, year).toString());
 
         try {
-            db = new database(mandant, year);
+            db = database.getInstance(mandant, year).get();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             System.exit(1);

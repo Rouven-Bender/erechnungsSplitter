@@ -1,12 +1,15 @@
 package rouven.bender.erechnungssplitter;
 
-import java.io.File;
+import java.io.*;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.*;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import rouven.bender.erechnungssplitter.models.MandantenSelector;
+import com.opencsv.CSVWriter;
+
+import rouven.bender.erechnungssplitter.models.*;
 
 @RestController
 public class management_api {
@@ -17,9 +20,33 @@ public class management_api {
         cfg = Config.getInstance();
         basepath = cfg.getSetting("basepath").toString();
     }
-    
-    @PostMapping("/api/management/export")
-    void export(@RequestBody MandantenSelector ms){}
+
+    @PostMapping(path="/api/management/export", produces = "text/csv")
+    ResponseEntity<byte[]> export(@RequestBody MandantenSelector ms){
+        try {
+            if (ms.mandant == "" || ms.year == ""){
+                return ResponseEntity.badRequest().build();
+            }
+            Optional<database> db = database.getInstance(ms.mandant, ms.year);
+            if (db.isPresent()) {
+                AccountingRow[] rows = db.get().getBookedData();
+                CharArrayWriter cw = new CharArrayWriter();
+                CSVWriter csv = new CSVWriter(cw);
+                csv.writeNext(AccountingRow.getHeader());
+                for (int i = 0; i<rows.length; i++) {
+                    csv.writeNext(rows[i].toStringArray());
+                }
+                csv.flush();
+                csv.close();
+                return ResponseEntity.ok().body(cw.toString().getBytes());
+            } else {
+                return ResponseEntity.noContent().build();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
     
     @PostMapping("/api/management/initdb")
     void initDatabase(@RequestBody MandantenSelector ms){}

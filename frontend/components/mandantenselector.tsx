@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 
-export function MandantenSelector({purpose, endpoint}: {purpose: string, endpoint: string}){
+export function MandantenSelector({purpose, endpoint, download}: {purpose: string, endpoint: string, download?: boolean}){
     const [ mandanten, setMandanten ] = useState<string[]>()
     const [ years, setYears ] = useState<string[]>()
     const [ selectedM, selectMandant ] = useState("");
@@ -35,7 +35,7 @@ export function MandantenSelector({purpose, endpoint}: {purpose: string, endpoin
     
     async function select() {
         if (selectedM != "" && selectedY != "") {
-            fetch(endpoint, {
+            const r = fetch(endpoint, {
                 method: "POST",
                 body: JSON.stringify({
                     mandant: selectedM,
@@ -45,6 +45,17 @@ export function MandantenSelector({purpose, endpoint}: {purpose: string, endpoin
                     "Content-Type": "application/json"
                 }
             })
+            if (download != undefined && download) {
+            r.then(rsp => {return rsp.blob()}).then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            })
+            }
         }
     }
     function unset_latest(){

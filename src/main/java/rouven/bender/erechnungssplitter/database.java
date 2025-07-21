@@ -7,9 +7,26 @@ import java.util.*;
 import rouven.bender.erechnungssplitter.models.*;
 
 public class database {
+    private static HashMap<String, database> instances = new HashMap<>();
     private Connection con;
 
-    public database(String mandant, String year) throws SQLException, ClassNotFoundException{
+    public static Optional<database> getInstance(String mandant, String year) {
+        database p = instances.get(mandant+year);
+        if (p != null) {
+            return Optional.of(p);
+        } else {
+            try {
+                p = new database(mandant, year);
+                instances.put(mandant+year, p);
+                return Optional.of(p);
+            } catch (Exception e){
+                e.printStackTrace();
+                return Optional.empty();
+            }
+        }
+    }
+
+    private database(String mandant, String year) throws SQLException, ClassNotFoundException{
         String path = (String) Config.getInstance().getSetting("basepath");
         path = Paths.get(path, mandant, year).toString();
         Class.forName("org.sqlite.JDBC");
@@ -42,6 +59,28 @@ public class database {
             stmt.executeUpdate();
         } catch(Exception e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    public AccountingRow[] getBookedData(){
+        ArrayList<AccountingRow> rows = new ArrayList<>();
+        try (PreparedStatement stmt = con.prepareStatement(
+            "select * from bookings"
+        )) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                AccountingRow r = new AccountingRow();
+                r.aufwandskonto = rs.getString("aufwandskonto");
+                r.betrag = rs.getString("betrag");
+                r.datum = rs.getString("datum");
+                r.personenkonto = rs.getString("personenkonto");
+                r.rechnungsnummer = rs.getString("rechnungsnummer");
+                r.text = rs.getString("werundwas");
+                rows.add(r);
+            }
+            return rows.toArray(new AccountingRow[0]);
+        } catch(Exception e) {
+            return new AccountingRow[0];
         }
     }
 
