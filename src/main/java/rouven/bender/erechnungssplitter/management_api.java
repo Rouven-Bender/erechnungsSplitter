@@ -53,8 +53,12 @@ public class management_api {
         if (ms.mandant == "" || ms.year == ""){
             return ResponseEntity.badRequest().build();
         }
-        if (database.getInstance(ms.mandant, ms.year).isEmpty()){
-            database.create(ms.mandant, ms.year);
+        DbExistence dbe = database.checkWithDBExists(ms.mandant, ms.year);
+        if (!dbe.customerwiseDatabase) {
+            database.createCustomer(ms.mandant);
+        }
+        if (!dbe.yearlyDatabase){
+            database.createYearly(ms.mandant, ms.year);
         } else {
             return ResponseEntity.badRequest().build();
         }

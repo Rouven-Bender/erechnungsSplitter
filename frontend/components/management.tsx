@@ -104,6 +104,15 @@ export function Management(){
         )
     }
 
+    function exportBookings(){
+        setExportMode(true);
+        setInitDBMode(false);
+    }
+    function initDB(){
+        setInitDBMode(true);
+        setExportMode(false);
+    }
+
     return (
         <div className="p-4 flex flex-row gap-4">
             <div>
@@ -116,8 +125,8 @@ export function Management(){
             <div>
                 <p>Aktionen:</p>
                 <ul className="list-disc pl-5">
-                    <li><a onClick={() => {setInitDBMode(false); setExportMode(true)}}>Export</a></li>
-                    <li><a onClick={() => {setInitDBMode(true); setExportMode(false)}}>Initializiere Datenbank</a></li>
+                    <li><a onClick={exportBookings}>Exportiere Aufteilungen</a></li>
+                    <li><a onClick={initDB}>Initializiere Datenbank</a></li>
                 </ul>
                 {selectorbox}
             </div>

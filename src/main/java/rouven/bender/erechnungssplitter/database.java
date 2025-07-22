@@ -10,7 +10,8 @@ import rouven.bender.erechnungssplitter.models.*;
 
 public class database {
     private static HashMap<String, database> instances = new HashMap<>();
-    private Connection con;
+    private Connection customerwide;
+    private Connection yearly;
 
     public static Optional<database> getInstance(String mandant, String year) {
         database p = instances.get(mandant+year);
@@ -30,26 +31,63 @@ public class database {
         }
     }
 
+    public static DbExistence checkWithDBExists(String mandant, String year) {
+        String path = (String) Config.getInstance().getSetting("basepath");
+        boolean yearly = Paths.get(path, mandant, year, "db.sqlite").toFile().exists();
+        boolean customer = Paths.get(path, mandant, "db.sqlite").toFile().exists();
+
+        DbExistence dbe = new DbExistence();
+        dbe.customerwiseDatabase = customer;
+        dbe.yearlyDatabase = yearly;
+        return dbe;
+    }
+
     private database(String mandant, String year) throws SQLException, ClassNotFoundException, NoSuchElementException{
         String path = (String) Config.getInstance().getSetting("basepath");
-        path = Paths.get(path, mandant, year, "db.sqlite").toString();
+        String yearlypath = Paths.get(path, mandant, year, "db.sqlite").toString();
+        String customerpath = Paths.get(path, mandant, "db.sqlite").toString();
         if (!new File(path).exists()) {
             throw new NoSuchElementException("there is not a database for this mandant year combination");
         }
         Class.forName("org.sqlite.JDBC");
-        con = DriverManager.getConnection("jdbc:sqlite:"+path);
+        customerwide = DriverManager.getConnection("jdbc:sqlite:"+customerpath);
+        yearly = DriverManager.getConnection("jdbc:sqlite:"+yearlypath);
     }
 
-    public static void create(String mandant, String year) {
+    public static void createCustomer(String mandant) {
         String path = (String) Config.getInstance().getSetting("basepath");
-        path = Paths.get(path, mandant, year).toString();
+        String customerpath = Paths.get(path, mandant, "db.sqlite").toString();
         try {
             Class.forName("org.sqlite.JDBC");
-            Connection c = DriverManager.getConnection("jdbc:sqlite:"+Paths.get(path, "db.sqlite").toString());
+            Connection c = DriverManager.getConnection("jdbc:sqlite:"+customerpath);
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            InputStream is = cl.getResourceAsStream("schema.sql");
+            InputStream is = cl.getResourceAsStream("customer-schema.sql");
             if (is == null) {
-                throw new IOException("schema.sql could not be read");
+                throw new IOException("customer-schema.sql could not be read");
+            }
+            String schema = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            String [] stmts = schema.split(";");
+            Statement s = c.createStatement();
+            for (int i = 0; i < stmts.length; i++) {
+                s.addBatch(stmts[i]);
+            }
+            s.executeBatch();
+            c.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void createYearly(String mandant, String year) {
+        String path = (String) Config.getInstance().getSetting("basepath");
+        String yearlypath = Paths.get(path, mandant, year, "db.sqlite").toString();
+        try {
+            Class.forName("org.sqlite.JDBC");
+            Connection c = DriverManager.getConnection("jdbc:sqlite:"+yearlypath);
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            InputStream is = cl.getResourceAsStream("yearly-schema.sql");
+            if (is == null) {
+                throw new IOException("yearly-schema.sql could not be read");
             }
             String schema = new String(is.readAllBytes(), StandardCharsets.UTF_8);
             String [] stmts = schema.split(";");
@@ -65,7 +103,7 @@ public class database {
     }
 
     public boolean invoiceBooked(String invoiceNumber, String personenkonto) {
-        try (PreparedStatement stmt = con.prepareStatement(
+        try (PreparedStatement stmt = yearly.prepareStatement(
             "select count(*) from bookings where rechnungsnummer=? and personenkonto=?"
         )){
             stmt.setString(1, invoiceNumber); 
@@ -82,7 +120,7 @@ public class database {
     }
 
     public void deleteBookedInvoice(String invoiceNumber, String personenkonto) {
-        try (PreparedStatement stmt = con.prepareStatement(
+        try (PreparedStatement stmt = yearly.prepareStatement(
             "delete from bookings where rechnungsnummer=? and personenkonto=?"
         )) {
             stmt.setString(1, invoiceNumber);
@@ -95,7 +133,7 @@ public class database {
 
     public AccountingRow[] getBookedData(){
         ArrayList<AccountingRow> rows = new ArrayList<>();
-        try (PreparedStatement stmt = con.prepareStatement(
+        try (PreparedStatement stmt = yearly.prepareStatement(
             "select * from bookings"
         )) {
             ResultSet rs = stmt.executeQuery();
@@ -117,7 +155,7 @@ public class database {
 
     public Optional<AccountedPosition[]> getBookedData(String rechnungsnummer, String personenkonto){
         ArrayList<AccountedPosition> rows = new ArrayList<>();
-        try (PreparedStatement stmt = con.prepareStatement(
+        try (PreparedStatement stmt = yearly.prepareStatement(
             "select * from bookings where personenkonto=? and rechnungsnummer=?"
         )) {
             stmt.setString(1, personenkonto);
@@ -149,7 +187,7 @@ public class database {
      * @throws SQLException
      */
     public boolean bookAccountingRow(AccountingRow row) throws SQLException {
-        try (PreparedStatement stmt = con.prepareStatement(
+        try (PreparedStatement stmt = yearly.prepareStatement(
             "insert into bookings (betrag, datum, rechnungsnummer, werundwas, personenkonto, aufwandskonto) values (?,?,?,?,?,?)"
         )) {
             stmt.setString(1, row.betrag);
@@ -165,7 +203,7 @@ public class database {
     }
 
     public void addPersonenkonto(Account a) throws SQLException {
-        try (PreparedStatement stmt = con.prepareStatement(
+        try (PreparedStatement stmt = customerwide.prepareStatement(
             "insert into personenkonto (kontonumber, aname) values (?, ?)"
         )) {
             stmt.setString(1, a.accountNumber);
@@ -178,7 +216,7 @@ public class database {
 
     public Optional<Account[]> getAccounts() {
         ArrayList<Account> tmp = new ArrayList<>();
-        try (PreparedStatement stmt = con.prepareStatement("select * from account")) {
+        try (PreparedStatement stmt = customerwide.prepareStatement("select * from account")) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 tmp.add(new Account(
@@ -194,7 +232,7 @@ public class database {
 
     public Optional<HashMap<String,String>> getPersonenkonten() {
         HashMap<String, String> out = new HashMap<>();
-        try (PreparedStatement stmt = con.prepareStatement("select * from personenkonto")) {
+        try (PreparedStatement stmt = customerwide.prepareStatement("select * from personenkonto")) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 out.put(rs.getString("aname"), rs.getString("kontonumber"));
