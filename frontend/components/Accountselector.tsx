@@ -18,6 +18,8 @@ export function Accountselector({className, position, searchterm, selected} : {c
 
         if (selected != undefined) {
             setSelected(selected)
+        } else {
+            setSelected("")
         }
     }, [selected])
 
