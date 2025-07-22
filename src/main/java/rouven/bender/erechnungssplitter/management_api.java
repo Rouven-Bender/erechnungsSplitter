@@ -49,7 +49,17 @@ public class management_api {
     }
     
     @PostMapping("/api/management/initdb")
-    void initDatabase(@RequestBody MandantenSelector ms){}
+    ResponseEntity<Integer> initDatabase(@RequestBody MandantenSelector ms){
+        if (ms.mandant == "" || ms.year == ""){
+            return ResponseEntity.badRequest().build();
+        }
+        if (database.getInstance(ms.mandant, ms.year).isEmpty()){
+            database.create(ms.mandant, ms.year);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(0);
+    }
 
     @GetMapping("/api/management/ui/mandanten")
     String[] getMandantenListe() {

@@ -46,18 +46,19 @@ export function MandantenSelector({purpose, endpoint, download}: {purpose: strin
                 }
             })
             if (download != undefined && download) {
-            r.then(rsp => {return rsp.blob()}).then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                window.URL.revokeObjectURL(url);
-            })
+                r.then(rsp => {return rsp.blob()}).then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                })
             }
         }
     }
+
     function unset_latest(){
         if (selectedY != "") {
             selectYear("")

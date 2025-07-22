@@ -1,5 +1,7 @@
 package rouven.bender.erechnungssplitter;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.sql.*;
 import java.util.*;
@@ -19,6 +21,8 @@ public class database {
                 p = new database(mandant, year);
                 instances.put(mandant+year, p);
                 return Optional.of(p);
+            } catch (NoSuchElementException e) {
+                return Optional.empty();
             } catch (Exception e){
                 e.printStackTrace();
                 return Optional.empty();
@@ -26,11 +30,38 @@ public class database {
         }
     }
 
-    private database(String mandant, String year) throws SQLException, ClassNotFoundException{
+    private database(String mandant, String year) throws SQLException, ClassNotFoundException, NoSuchElementException{
+        String path = (String) Config.getInstance().getSetting("basepath");
+        path = Paths.get(path, mandant, year, "db.sqlite").toString();
+        if (!new File(path).exists()) {
+            throw new NoSuchElementException("there is not a database for this mandant year combination");
+        }
+        Class.forName("org.sqlite.JDBC");
+        con = DriverManager.getConnection("jdbc:sqlite:"+path);
+    }
+
+    public static void create(String mandant, String year) {
         String path = (String) Config.getInstance().getSetting("basepath");
         path = Paths.get(path, mandant, year).toString();
-        Class.forName("org.sqlite.JDBC");
-        con = DriverManager.getConnection("jdbc:sqlite:"+Paths.get(path, "db.sqlite").toString());
+        try {
+            Class.forName("org.sqlite.JDBC");
+            Connection c = DriverManager.getConnection("jdbc:sqlite:"+Paths.get(path, "db.sqlite").toString());
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            InputStream is = cl.getResourceAsStream("schema.sql");
+            if (is == null) {
+                throw new IOException("schema.sql could not be read");
+            }
+            String schema = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            String [] stmts = schema.split(";");
+            Statement s = c.createStatement();
+            for (int i = 0; i < stmts.length; i++) {
+                s.addBatch(stmts[i]);;
+            }
+            s.executeBatch();
+            c.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean invoiceBooked(String invoiceNumber, String personenkonto) {
