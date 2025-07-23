@@ -10,6 +10,7 @@ export function Management(){
     const [ selectedY, selectYear ] = useState("");
     const [ exportMode, setExportMode ] = useState(false)
     const [ initDBMode, setInitDBMode ] = useState(false)
+    const [ accountEditMode, setAccountEditMode ] = useState(false)
 
     const navigate = useNavigate();
 
@@ -73,6 +74,9 @@ export function Management(){
     if (initDBMode) {
         selectorbox = <MandantenSelector purpose="Initialisieren" endpoint="/api/management/initdb"/>
     }
+    if (accountEditMode) {
+        selectorbox = <MandantenSelector purpose="Konten bearbeiten" endpoint="/api/management/editAccounts" redirect="/management/editAccounts"/>
+    }
 
     var inner
     if (selectedM == "") {
@@ -107,10 +111,19 @@ export function Management(){
     function exportBookings(){
         setExportMode(true);
         setInitDBMode(false);
+        setAccountEditMode(false);
     }
+
     function initDB(){
         setInitDBMode(true);
         setExportMode(false);
+        setAccountEditMode(false);
+    }
+
+    function editAccounts(){
+        setAccountEditMode(true);
+        setExportMode(false);
+        setInitDBMode(false);
     }
 
     return (
@@ -127,6 +140,7 @@ export function Management(){
                 <ul className="list-disc pl-5">
                     <li><a onClick={exportBookings}>Exportiere Aufteilungen</a></li>
                     <li><a onClick={initDB}>Initializiere Datenbank</a></li>
+                    <li><a onClick={editAccounts}>Konten bearbeiten</a></li>
                 </ul>
                 {selectorbox}
             </div>

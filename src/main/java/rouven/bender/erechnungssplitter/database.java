@@ -78,6 +78,18 @@ public class database {
         }
     }
 
+    public void addAccount(Account acc) {
+        try (PreparedStatement stmt = customerwide.prepareStatement(
+            "insert into account (accountnumber, aname) values (?,?)"
+        )){
+            stmt.setString(1, acc.accountNumber);
+            stmt.setString(2, acc.name);
+            stmt.execute();
+        } catch (SQLException e) {
+            return;
+        }
+    }
+
     public static void createYearly(String mandant, String year) {
         String path = (String) Config.getInstance().getSetting("basepath");
         String yearlypath = Paths.get(path, mandant, year, "db.sqlite").toString();

@@ -87,7 +87,7 @@ export function PDFDisplay(){
             <div className="pt-2 flex flex-col gap-y-2">
                 <p>Rechnungsnummer: {invoice?.invoiceNumber}</p>
                 <p>Rechnungsdatum: <input name="rechungsdatum" type="date" value={invoice.datum?.toString()} disabled={true}/></p>
-                <table className="border-1 border-spacing-x-3 border-seperate">
+                <table>
                     <thead>
                     <tr>
                         <th>Produktname</th>

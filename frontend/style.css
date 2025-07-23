@@ -2,6 +2,11 @@
 
 @layer base {
     table {
-        border-collapse: separate;
+        border-collapse: collapse;
+    }
+    td, th {
+        border: 1px solid;
+        text-align: left;
+        padding: 4px;
     }
 }

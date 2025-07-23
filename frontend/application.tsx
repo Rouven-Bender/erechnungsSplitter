@@ -6,6 +6,7 @@ import { createBrowserRouter, Navigate, RouterProvider, useParams } from "react-
 import { PDFDisplay } from "./components/PDFDisplay";
 import { Booker } from "./components/booker";
 import { Management } from "./components/management";
+import { AccountEditor } from "./components/AccountEditor";
 import { Link } from "react-router-dom";
 
 function Application(){
@@ -26,7 +27,8 @@ const router = createBrowserRouter([
     //{path: "/", element: <Navigate to={"/element/0"}/>},
     {path: "/", element: <Navigate to={"/management"}/>},
     {path: "/element/:id", element: <Application/>},
-    {path: "/management", element: <Management/>}
+    {path: "/management", element: <Management/>},
+    {path: "/management/editAccounts", element: <AccountEditor/>}
 ]);
 
 createRoot(document.getElementById('app')).render(

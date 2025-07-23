@@ -1,10 +1,13 @@
 import React, {useState, useEffect} from "react";
+import { useNavigate } from "react-router-dom";
 
-export function MandantenSelector({purpose, endpoint, download}: {purpose: string, endpoint: string, download?: boolean}){
+export function MandantenSelector({purpose, endpoint, download, redirect}: {purpose: string, endpoint: string, download?: boolean, redirect?: string}){
     const [ mandanten, setMandanten ] = useState<string[]>()
     const [ years, setYears ] = useState<string[]>()
     const [ selectedM, selectMandant ] = useState("");
     const [ selectedY, selectYear ] = useState("");
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         try {
@@ -55,6 +58,10 @@ export function MandantenSelector({purpose, endpoint, download}: {purpose: strin
                     a.remove();
                     window.URL.revokeObjectURL(url);
                 })
+            }
+            if (redirect != undefined) {
+                await r;
+                navigate(redirect);
             }
         }
     }

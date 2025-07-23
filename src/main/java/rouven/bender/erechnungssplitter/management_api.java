@@ -15,6 +15,7 @@ import rouven.bender.erechnungssplitter.models.*;
 public class management_api {
     private Config cfg;
     private String basepath;
+    private database db;
 
     management_api(){
         cfg = Config.getInstance();
@@ -63,6 +64,33 @@ public class management_api {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(0);
+    }
+
+    @GetMapping("/api/management/accounts")
+    Account[] getAccounts(){
+        return db.getAccounts().orElse(new Account[0]);
+    }
+
+    @PostMapping("/api/management/addAccount")
+    void addAccount(@RequestBody Account acc) {
+        if (   acc.accountNumber.matches("[0-9]*")
+            && !(acc.name == "")
+            && acc.name.length() < 255 )
+        {
+             db.addAccount(acc);
+        }
+    }
+
+    @PostMapping("/api/management/editAccounts")
+    void editAccounts(@RequestBody MandantenSelector ms) {
+        if (ms.mandant == "" || ms.year == "") {
+            return;
+        }
+        try {
+            db = database.getInstance(ms.mandant, ms.year).get();
+        } catch (NoSuchElementException e) {
+            e.printStackTrace();
+        }
     }
 
     @GetMapping("/api/management/ui/mandanten")

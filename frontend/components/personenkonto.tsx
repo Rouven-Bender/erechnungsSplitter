@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import { Account, PersonenkontoRsp } from "../types";
 import { useParams } from "react-router-dom";
+import { isNumber } from "../helpers";
 
 export default function Personenkonto({sender} : {sender : string | undefined}) {
     const { id } = useParams()
@@ -23,7 +24,7 @@ export default function Personenkonto({sender} : {sender : string | undefined}) 
             setErrorMsg("Eingabe war leer")
             return;
         }
-        if (!k.toString().match("[0-9*]")){
+        if (!isNumber(k.toString())){
             setErrorMsg("Eingabe beinhaltete mehr wie Zahlen")
             return;
         }
