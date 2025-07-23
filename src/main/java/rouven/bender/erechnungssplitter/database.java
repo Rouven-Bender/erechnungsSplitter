@@ -78,6 +78,33 @@ public class database {
         }
     }
 
+    public boolean AccountExists(Account acc) {
+        try (PreparedStatement stmt = customerwide.prepareStatement(
+            "select * from account where accountnumber=?"
+        )) {
+            stmt.setString(1, acc.accountNumber);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            return false;
+        }
+        return false;
+    }
+
+    public void deleteAccount(Account acc) {
+        try (PreparedStatement stmt = customerwide.prepareStatement(
+            "delete from account where accountnumber=? and aname=?"
+        )) {
+           stmt.setString(1, acc.accountNumber); 
+           stmt.setString(2, acc.name);
+           stmt.execute();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     public void addAccount(Account acc) {
         try (PreparedStatement stmt = customerwide.prepareStatement(
             "insert into account (accountnumber, aname) values (?,?)"

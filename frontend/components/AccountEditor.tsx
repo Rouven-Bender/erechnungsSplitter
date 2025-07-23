@@ -31,7 +31,7 @@ export function AccountEditor(){
             accountNumber: accnum,
             name: accname
         }
-        fetch("/api/management/addAccount", {
+        fetch("/api/management/accounts", {
             method: "POST",
             body: JSON.stringify(acc),
             headers: {
@@ -41,6 +41,19 @@ export function AccountEditor(){
         accounts.push(acc)
         setAccounts(accounts)
         setAddDialogOpen(false)
+    }
+
+    function deleteElement(acc: Account, idx: number) {
+        fetch("/api/management/accounts", {
+            method: "DELETE",
+            body: JSON.stringify(acc),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        var before = accounts.slice(0, idx)
+        var after = accounts.slice(idx+1, accounts.length)
+        setAccounts(before.concat(after))
     }
 
     return (
@@ -58,6 +71,7 @@ export function AccountEditor(){
                         <tr key={idx}>
                             <td>{row.accountNumber}</td>
                             <td>{row.name}</td>
+                            <td><a onClick={() => deleteElement(row, idx)}>Löschen</a></td>
                         </tr>
                     )
                 })}

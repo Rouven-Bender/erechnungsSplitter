@@ -71,13 +71,24 @@ public class management_api {
         return db.getAccounts().orElse(new Account[0]);
     }
 
-    @PostMapping("/api/management/addAccount")
+    @PostMapping("/api/management/accounts")
     void addAccount(@RequestBody Account acc) {
         if (   acc.accountNumber.matches("[0-9]*")
             && !(acc.name == "")
             && acc.name.length() < 255 )
         {
              db.addAccount(acc);
+        }
+    }
+
+    @DeleteMapping("/api/management/accounts")
+    void deleteAccount(@RequestBody Account acc) {
+        if (   acc.accountNumber.matches("[0-9]*")
+            && !(acc.name == "")
+            && acc.name.length() < 255 
+            && db.AccountExists(acc))
+        {
+            db.deleteAccount(acc);
         }
     }
 
