@@ -41,3 +41,9 @@ export type AccountedPosition = {
 export type PersonenkontoRsp = {
     personenkonto: string | null;
 }
+
+export type MandantAuswahl = {
+    mandant: string;
+    year?: string;
+    month?: string;
+}

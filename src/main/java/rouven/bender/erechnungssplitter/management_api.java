@@ -25,10 +25,10 @@ public class management_api {
     @PostMapping(path="/api/management/export", produces = "text/csv")
     ResponseEntity<byte[]> export(@RequestBody MandantenSelector ms){
         try {
-            if (ms.mandant == "" || ms.year == ""){
+            if (ms.mandant == "" || ms.year == "" || ms.month == ""){
                 return ResponseEntity.badRequest().build();
             }
-            Optional<database> db = database.getInstance(ms.mandant, ms.year);
+            Optional<database> db = database.getInstance(ms.mandant, ms.year, ms.month);
             if (db.isPresent()) {
                 AccountingRow[] rows = db.get().getBookedData();
                 CharArrayWriter cw = new CharArrayWriter();
@@ -51,15 +51,15 @@ public class management_api {
     
     @PostMapping("/api/management/initdb")
     ResponseEntity<Integer> initDatabase(@RequestBody MandantenSelector ms){
-        if (ms.mandant == "" || ms.year == ""){
+        if (ms.mandant == "" || ms.year == "" || ms.month == ""){
             return ResponseEntity.badRequest().build();
         }
-        DbExistence dbe = database.checkWithDBExists(ms.mandant, ms.year);
+        DbExistence dbe = database.checkWithDBExists(ms.mandant, ms.year, ms.month);
         if (!dbe.customerwiseDatabase) {
             database.createCustomer(ms.mandant);
         }
-        if (!dbe.yearlyDatabase){
-            database.createYearly(ms.mandant, ms.year);
+        if (!dbe.monthlyDatabase){
+            database.createMonthly(ms.mandant, ms.year, ms.month);
         } else {
             return ResponseEntity.badRequest().build();
         }
@@ -94,11 +94,11 @@ public class management_api {
 
     @PostMapping("/api/management/editAccounts")
     void editAccounts(@RequestBody MandantenSelector ms) {
-        if (ms.mandant == "" || ms.year == "") {
+        if (ms.mandant == "" || ms.year == "" || ms.month == "") {
             return;
         }
         try {
-            db = database.getInstance(ms.mandant, ms.year).get();
+            db = database.getInstance(ms.mandant, ms.year, ms.month).get();
         } catch (NoSuchElementException e) {
             e.printStackTrace();
         }
@@ -116,8 +116,25 @@ public class management_api {
     }
 
     @PostMapping("/api/management/ui/year")
-    String[] getYears(@RequestBody String name){
-        File[] dirs = Paths.get(basepath, name).toFile().listFiles(File::isDirectory);
+    String[] getYears(@RequestBody MandantenSelector m){
+        if (m.mandant == null) {
+            return new String[0];
+        }
+        File[] dirs = Paths.get(basepath, m.mandant).toFile().listFiles(File::isDirectory);
+        ArrayList<String> t = new ArrayList<>();
+        for (int i = 0; i<dirs.length; i++) {
+            String[] p = dirs[i].toString().split(File.separator);
+            t.add(p[p.length-1]);
+        }
+        return t.toArray(new String[0]);
+    }
+
+    @PostMapping("/api/management/ui/month")
+    String[] getMonths(@RequestBody MandantenSelector m){
+        if (m.mandant == null || m.year == null) {
+            return new String[0];
+        }
+        File[] dirs = Paths.get(basepath, m.mandant, m.year).toFile().listFiles(File::isDirectory);
         ArrayList<String> t = new ArrayList<>();
         for (int i = 0; i<dirs.length; i++) {
             String[] p = dirs[i].toString().split(File.separator);

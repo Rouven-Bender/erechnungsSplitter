@@ -11,16 +11,16 @@ import rouven.bender.erechnungssplitter.models.*;
 public class database {
     private static HashMap<String, database> instances = new HashMap<>();
     private Connection customerwide;
-    private Connection yearly;
+    private Connection monthly;
 
-    public static Optional<database> getInstance(String mandant, String year) {
+    public static Optional<database> getInstance(String mandant, String year, String month) {
         database p = instances.get(mandant+year);
         if (p != null) {
             return Optional.of(p);
         } else {
             try {
-                p = new database(mandant, year);
-                instances.put(mandant+year, p);
+                p = new database(mandant, year, month);
+                instances.put(mandant+year+month, p);
                 return Optional.of(p);
             } catch (NoSuchElementException e) {
                 return Optional.empty();
@@ -31,27 +31,27 @@ public class database {
         }
     }
 
-    public static DbExistence checkWithDBExists(String mandant, String year) {
+    public static DbExistence checkWithDBExists(String mandant, String year, String month) {
         String path = (String) Config.getInstance().getSetting("basepath");
-        boolean yearly = Paths.get(path, mandant, year, "db.sqlite").toFile().exists();
+        boolean monthly = Paths.get(path, mandant, year, month, "db.sqlite").toFile().exists();
         boolean customer = Paths.get(path, mandant, "db.sqlite").toFile().exists();
 
         DbExistence dbe = new DbExistence();
         dbe.customerwiseDatabase = customer;
-        dbe.yearlyDatabase = yearly;
+        dbe.monthlyDatabase = monthly;
         return dbe;
     }
 
-    private database(String mandant, String year) throws SQLException, ClassNotFoundException, NoSuchElementException{
+    private database(String mandant, String year, String month) throws SQLException, ClassNotFoundException, NoSuchElementException{
         String path = (String) Config.getInstance().getSetting("basepath");
-        String yearlypath = Paths.get(path, mandant, year, "db.sqlite").toString();
+        String monthlypath = Paths.get(path, mandant, year, month, "db.sqlite").toString();
         String customerpath = Paths.get(path, mandant, "db.sqlite").toString();
         if (!new File(path).exists()) {
             throw new NoSuchElementException("there is not a database for this mandant year combination");
         }
         Class.forName("org.sqlite.JDBC");
         customerwide = DriverManager.getConnection("jdbc:sqlite:"+customerpath);
-        yearly = DriverManager.getConnection("jdbc:sqlite:"+yearlypath);
+        monthly = DriverManager.getConnection("jdbc:sqlite:"+monthlypath);
     }
 
     public static void createCustomer(String mandant) {
@@ -117,16 +117,16 @@ public class database {
         }
     }
 
-    public static void createYearly(String mandant, String year) {
+    public static void createMonthly(String mandant, String year, String month) {
         String path = (String) Config.getInstance().getSetting("basepath");
-        String yearlypath = Paths.get(path, mandant, year, "db.sqlite").toString();
+        String monthlypath = Paths.get(path, mandant, year, month, "db.sqlite").toString();
         try {
             Class.forName("org.sqlite.JDBC");
-            Connection c = DriverManager.getConnection("jdbc:sqlite:"+yearlypath);
+            Connection c = DriverManager.getConnection("jdbc:sqlite:"+monthlypath);
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            InputStream is = cl.getResourceAsStream("yearly-schema.sql");
+            InputStream is = cl.getResourceAsStream("monthly-schema.sql");
             if (is == null) {
-                throw new IOException("yearly-schema.sql could not be read");
+                throw new IOException("monthly-schema.sql could not be read");
             }
             String schema = new String(is.readAllBytes(), StandardCharsets.UTF_8);
             String [] stmts = schema.split(";");
@@ -142,7 +142,7 @@ public class database {
     }
 
     public boolean invoiceBooked(String invoiceNumber, String personenkonto) {
-        try (PreparedStatement stmt = yearly.prepareStatement(
+        try (PreparedStatement stmt = monthly.prepareStatement(
             "select count(*) from bookings where rechnungsnummer=? and personenkonto=?"
         )){
             stmt.setString(1, invoiceNumber); 
@@ -159,7 +159,7 @@ public class database {
     }
 
     public void deleteBookedInvoice(String invoiceNumber, String personenkonto) {
-        try (PreparedStatement stmt = yearly.prepareStatement(
+        try (PreparedStatement stmt = monthly.prepareStatement(
             "delete from bookings where rechnungsnummer=? and personenkonto=?"
         )) {
             stmt.setString(1, invoiceNumber);
@@ -172,7 +172,7 @@ public class database {
 
     public AccountingRow[] getBookedData(){
         ArrayList<AccountingRow> rows = new ArrayList<>();
-        try (PreparedStatement stmt = yearly.prepareStatement(
+        try (PreparedStatement stmt = monthly.prepareStatement(
             "select * from bookings"
         )) {
             ResultSet rs = stmt.executeQuery();
@@ -194,7 +194,7 @@ public class database {
 
     public Optional<AccountedPosition[]> getBookedData(String rechnungsnummer, String personenkonto){
         ArrayList<AccountedPosition> rows = new ArrayList<>();
-        try (PreparedStatement stmt = yearly.prepareStatement(
+        try (PreparedStatement stmt = monthly.prepareStatement(
             "select * from bookings where personenkonto=? and rechnungsnummer=?"
         )) {
             stmt.setString(1, personenkonto);
@@ -226,7 +226,7 @@ public class database {
      * @throws SQLException
      */
     public boolean bookAccountingRow(AccountingRow row) throws SQLException {
-        try (PreparedStatement stmt = yearly.prepareStatement(
+        try (PreparedStatement stmt = monthly.prepareStatement(
             "insert into bookings (betrag, datum, rechnungsnummer, werundwas, personenkonto, aufwandskonto) values (?,?,?,?,?,?)"
         )) {
             stmt.setString(1, row.betrag);

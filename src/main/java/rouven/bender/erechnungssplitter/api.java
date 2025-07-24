@@ -22,6 +22,7 @@ class RestAPI {
 
     private String mandant = "";
     private String year = "";
+    private String month = "";
 
     private Account[] accounts;
     private HashMap<String, String> Personenkontos;
@@ -32,10 +33,10 @@ class RestAPI {
     }
 
     private void init() {
-        path = new File(Paths.get(basepath, mandant, year).toString());
+        path = new File(Paths.get(basepath, mandant, year, month).toString());
 
         try {
-            db = database.getInstance(mandant, year).get();
+            db = database.getInstance(mandant, year, month).get();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             System.exit(1);
@@ -90,8 +91,12 @@ class RestAPI {
     
     @PostMapping("/api/select/mandant")
     void selectMandant(@RequestBody MandantenSelector m){
+        if (m.mandant == null || m.year == null || m.month == null) {
+            return;
+        }
         mandant = m.mandant;
         year = m.year;
+        month = m.month;
         init();
     }
 
@@ -152,17 +157,6 @@ class RestAPI {
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-    @GetMapping("/api/filetree/reset")
-    void reset(){
-        path = new File(basepath);
-    }
-
-    @GetMapping("/test")
-    String test() {
-        return mandant;
-    }
-
 
     @PostMapping("/api/{id}/book")
     void book(@RequestBody BookingRequest request, @PathVariable("id") int id) { //TODO get error to client
@@ -226,33 +220,6 @@ class RestAPI {
                 }
             }
         }
-    }
-    
-    @GetMapping("/api/filetree/pwd")
-    String pwd(){
-        return path.toString();
-    }
-
-    @GetMapping("/api/filetree/ls")
-    String[] ls(){
-        File[] fs = path.listFiles(File::isDirectory);
-        if (fs == null) {
-            return null;
-        }
-        String[] p = new String[fs.length];
-        for (int i=0; i<fs.length; i++) {
-            String[] dirs = fs[i].toString().split(File.separator);
-            p[i] = dirs[dirs.length-1];
-        }
-        return p;
-    }
-
-    @PostMapping("/api/filetree/open") //Opening a folder
-    void open(@RequestBody String directoryname){
-        Path p = Paths.get(path.toString(), directoryname).normalize();
-        path = new File(p.toUri());
-
-        refreshPDFSGlobal();
     }
 
     private void refreshPDFSGlobal(){

@@ -2,12 +2,15 @@ import React, {useState, useEffect, ChangeEvent} from "react";
 import { useNavigate } from "react-router-dom";
 
 import { MandantenSelector } from "./mandantenselector";
+import { MandantAuswahl } from "../types";
 
 export function Management(){
     const [ mandanten, setMandanten ] = useState<string[]>()
     const [ years, setYears ] = useState<string[]>()
-    const [ selectedM, selectMandant ] = useState("");
+    const [ months, setMonths ] = useState<string[]>()
+    const [ selectedMa, selectMandant ] = useState("");
     const [ selectedY, selectYear ] = useState("");
+    const [ selectedMo, selectMonth ] = useState("");
     const [ exportMode, setExportMode ] = useState(false)
     const [ initDBMode, setInitDBMode ] = useState(false)
     const [ accountEditMode, setAccountEditMode ] = useState(false)
@@ -17,13 +20,18 @@ export function Management(){
     useEffect(() => {
         try {
             fetch("/api/management/ui/mandanten").then(rsp => {return rsp.json()}).then(json => {setMandanten(json)})
-            if (selectedM != "") {
-                fetch("/api/management/ui/year", {method: "POST", body: selectedM}).then(rsp => {return rsp.json()}).then(json => {setYears(json)})
+            if (selectedMa != "") {
+                var m: MandantAuswahl = {mandant: selectedMa}
+                fetch("/api/management/ui/year", {method: "POST", body: JSON.stringify(m), headers: {"Content-Type": "application/json"}}).then(rsp => {return rsp.json()}).then(json => {setYears(json)})
+            }
+            if (selectedY != "") {
+                var m: MandantAuswahl = {mandant: selectedMa, year: selectedY}
+                fetch("/api/management/ui/month", {method: "POST", body: JSON.stringify(m), headers: {"Content-Type": "application/json"}}).then(rsp => {return rsp.json()}).then(json => {setMonths(json)})
             }
         } catch (err) {
             console.log(err.message)
         }
-    }, [selectedM])
+    }, [selectedMa, selectedY])
 
     async function mandant(event) {
         var v = event.target.innerText
@@ -39,15 +47,24 @@ export function Management(){
         }
         selectYear(v)
     }
+    async function month(event) {
+        var v = event.target.innerText
+        if (v.length == 0) {
+            return;
+        }
+        selectMonth(v)
+    }
 
     async function select(){
-        if (selectedM != "" && selectedY != "") {
+        if (selectedMa != "" && selectedY != "") {
+            var m: MandantAuswahl = {
+                mandant: selectedMa,
+                year: selectedY,
+                month: selectedMo
+            }
             await fetch("/api/select/mandant", {
                 method: "POST",
-                body: JSON.stringify({
-                    mandant: selectedM,
-                    year: selectedY
-                }),
+                body: JSON.stringify(m),
                 headers: {
                     "Content-Type": "application/json"
                 }
@@ -57,11 +74,15 @@ export function Management(){
     }
 
     function unset_latest(){
+        if (selectedMo != "") {
+            selectMonth("")
+            return;
+        }
         if (selectedY != "") {
             selectYear("")
             return;
         }
-        if (selectedM != "") {
+        if (selectedMa != "") {
             selectMandant("")
             return;
         }
@@ -79,7 +100,7 @@ export function Management(){
     }
 
     var inner
-    if (selectedM == "") {
+    if (selectedMa == "") {
         inner = (
             <div>
                 <p>Mandanten:</p>
@@ -93,7 +114,7 @@ export function Management(){
             </div>
         )
     }
-    if (selectedM != "" && selectedY == "") {
+    if (selectedMa != "" && selectedY == "") {
         inner = (
             <div>
                 <p>Jahr:</p>
@@ -101,6 +122,20 @@ export function Management(){
                 {years?.map((m, idx) => {
                     return (
                         <li key={idx}><a onClick={year}>{m}</a></li>
+                    )
+                })}
+                </ul>
+            </div>
+        )
+    }
+    if (selectedMa != "" && selectedY != "" && selectedMo == "") {
+        inner = (
+            <div>
+                <p>Monat:</p>
+                <ul className="list-disc pl-5">
+                {months?.map((m, idx) => {
+                    return (
+                        <li key={idx}><a onClick={month}>{m}</a></li>
                     )
                 })}
                 </ul>
