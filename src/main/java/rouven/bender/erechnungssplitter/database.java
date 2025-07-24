@@ -43,6 +43,9 @@ public class database {
     }
 
     private database(String mandant, String year, String month) throws SQLException, ClassNotFoundException, NoSuchElementException{
+        if (mandant == "" || year == "" || month == "") {
+            throw new NoSuchElementException("atleast one parameter was empty");
+        }
         String path = (String) Config.getInstance().getSetting("basepath");
         String monthlypath = Paths.get(path, mandant, year, month, "db.sqlite").toString();
         String customerpath = Paths.get(path, mandant, "db.sqlite").toString();

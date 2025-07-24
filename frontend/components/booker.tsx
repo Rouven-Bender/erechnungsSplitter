@@ -108,8 +108,7 @@ export function Booker() {
     var fullinvoicebooker = (
             <div>
                 <p>Konto für Rechnung: <br/></p>
-                <Accountselector searchterm={searchterm} position={"fullInvoice"}
-                    selected={accounteddata != undefined && accounteddata[0] && !editMode ? accounteddata[0].accountNumber : undefined} className="pr-3"/>
+                <Accountselector searchterm={searchterm} position={"fullInvoice"} className="pr-3" idx={0}/>
             </div>
     )
 
@@ -134,8 +133,7 @@ export function Booker() {
                             <td>{row.netto}</td>
                             <td>{row.quantity}</td>
                             <td>{row.total}</td>
-                            <td><Accountselector searchterm={searchterm} position={row.listId}
-                                selected={accounteddata != undefined && accounteddata[parseInt(row.listId)-1] && !editMode? accounteddata[parseInt(row.listId)-1]?.accountNumber : undefined}/></td>
+                            <td><Accountselector searchterm={searchterm} position={row.listId} idx={idx}/></td>
                         </tr>
                     ) 
                 })}
