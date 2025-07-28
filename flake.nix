@@ -26,10 +26,10 @@
 					];
 
 					shellHook = ''
-			alias code="codium"
-			alias r="yarn run build && mvn spring-boot:run"
-			echo "use 'r' to run project"
-			'';
+						alias code="codium"
+						alias r="yarn run build && mvn spring-boot:run"
+						echo "use 'r' to run project"
+					'';
 				};
 		};
 }
