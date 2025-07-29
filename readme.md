@@ -6,6 +6,7 @@ This App is meant to split zugferd invoices into the different accounts used in 
 so maybe 2028 when the deadline passes and the law (in germany) changes that. Until then Usability and or fitness is unknown but the potential is there
 # TODO:
 - Add auto selecting of account if the same item from the same seller was booked before
+- Change the csv export table layout to the layout that datev can import
 # Usage
 with the nix flake use the "r" alias to run the backend
 then connect on the same maschine with a web browser on localhost:8080
